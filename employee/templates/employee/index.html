@@ -3,6 +3,7 @@
     <div class="container-fluid bg-success text-white text-center">
         <h1>TRA CỨU THÔNG TIN CÁN BỘ</h1>
     </div>
+    
     <div class = "row">
         <div class = "col"></div>
         <div class = "col"></div>
@@ -10,148 +11,194 @@
         <div class = "col"></div>
         <div class = "col"><a href="{% url 'employee:add_employee' %}" class="btn btn-primary mt-3">Thêm mới thông tin cán bộ</a></div>
     </div>
-    <div class="table-scroll">
-        <table class="table table-hover table-canbo table-bordered mt-3 text-center resizable-table">
-            <thead class="head-blue">
-                <tr>
-                    <th>
-                        <span class="th-ellipsis">Số hiệu</span>
-                        <div class="col-resizer"></div>
-                    </th>
-                    <th class="col-fullname">
-                        <span class="th-ellipsis">Họ và tên</span>
-                        <div class="col-resizer"></div>
-                    </th>
-                    <th>
-                        <span class="th-ellipsis">Ngày sinh</span>
-                        <div class="col-resizer"></div>
-                    </th>
-                    <th>
-                        <span class="th-ellipsis">Giới tính</span>
-                        <div class="col-resizer"></div>
-                    </th>
-                    <th>
-                        <span class="th-ellipsis">Quê quán</span>
-                        <div class="col-resizer"></div>
-                    </th>
-                    <th>
-                        <span class="th-ellipsis">Nơi cư trú hiện tại</span>
-                        <div class="col-resizer"></div>
-                    </th>
-                    <th>
-                        <span class="th-ellipsis">Dân tộc</span>
-                        <div class="col-resizer"></div>
-                    </th>
-                    <th>
-                        <span class="th-ellipsis">Tôn giáo</span>
-                        <div class="col-resizer"></div>
-                    </th>
-                    <th>
-                        <span class="th-ellipsis">Nghề nghiệp của gia đình</span>
-                        <div class="col-resizer"></div>
-                    </tth>
-                    <th>
-                        <span class="th-ellipsis">Công việc trước đây</span>
-                        <div class="col-resizer"></div>
-                    </th>
-                    <th>
-                        <span class="th-ellipsis">Ngày vào đoàn</span>
-                        <div class="col-resizer"></div>
-                    </th>
-                    <th>
-                        <span class="th-ellipsis">Đoàn viên</span>
-                        <div class="col-resizer"></div>
-                    </th>
-                    <th>
-                        <span class="th-ellipsis">Ngày vào Đảng</span>
-                        <div class="col-resizer"></div>
-                    </th>
-                    <th>
-                        <span class="th-ellipsis">Ngày chính thức</span>
-                        <div class="col-resizer"></div>
-                    </th>
-                    <th>
-                        <span class="th-ellipsis">Ngày tuyển dụng</span>
-                        <div class="col-resizer"></div>
-                    </th>
-                    <th>
-                        <span class="th-ellipsis">Ngày vào công an</span>
-                        <div class="col-resizer"></div>
-                    </th>
-                    <th>
-                        <span class="th-ellipsis">Nơi tuyển dụng</span>
-                        <div class="col-resizer"></div>
-                    </th>
-                    <th>
-                        <span class="th-ellipsis">Nguồn tuyển dụng</span>
-                        <div class="col-resizer"></div>
-                    </th>
-                    <th>
-                        <span class="th-ellipsis">Nhóm máu</span>
-                        <div class="col-resizer"></div>
-                    </th>
-                    <th>
-                        <span class="th-ellipsis">Danh hiệu được phong</span>
-                        <div class="col-resizer"></div>
-                    </th>
-                    <th>
-                        <span class="th-ellipsis">Địa chỉ hồ sơ</span>
-                        <div class="col-resizer"></div>
-                    </th>
-                    <th>
-                        <span class="th-ellipsis">Năng lực nổi bật</span>
-                        <div class="col-resizer"></div>
-                    </th>
-                    <th>
-                        <span class="th-ellipsis">Mô tả</span>
-                        <div class="col-resizer"></div>
-                    </th>
-                    <th class="action-col sticky-edit"></th>
-                    <th class="action-col sticky-delete"></th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for employee in employees %}
-                <tr>
-                    <td data-bs-toggle="tooltip" title="{{ employee.emp_num }}">{{ employee.emp_num }}</td>
-                    <td class = "col-fullname">{{ employee.full_name }}</td>
-                    <td data-bs-toggle="tooltip" title="{{ employee.day_of_birth }}">{{ employee.day_of_birth }}</td>
-                    <td data-bs-toggle="tooltip" title="{{ employee.get_gender_display }}">{{ employee.get_gender_display }}</td>
-                    <td data-bs-toggle="tooltip" title="{{ employee.place_of_hometown }}">{{ employee.place_of_hometown }}</td>
-                    <td data-bs-toggle="tooltip" title="{{ employee.current_residence }}">{{ employee.current_residence }}</td>
-                    <td data-bs-toggle="tooltip" title="{{ employee.nation }}">{{ employee.nation }}</td>
-                    <td data-bs-toggle="tooltip" title="{{ employee.religion }}">{{ employee.religion }}</td>
-                    <td data-bs-toggle="tooltip" title="{{ employee.family_job }}">{{ employee.family_job }}</td>
-                    <td data-bs-toggle="tooltip" title="{{ employee.before_job }}">{{ employee.before_job }}</td>
-                    <td data-bs-toggle="tooltip" title="{{ employee.date_in_group }}">{{ employee.date_in_group }}</td>
-                    <td data-bs-toggle="tooltip" title="{{ employee.get_union_display }}">{{ employee.get_union_display }}</td>
-                    <td data-bs-toggle="tooltip" title="{{ employee.day_of_joining_the_party }}">{{ employee.day_of_joining_the_party }}</td>
-                    <td data-bs-toggle="tooltip" title="{{ employee.day_offical }}">{{ employee.day_offical }}</td>
-                    <td data-bs-toggle="tooltip" title="{{ employee.recruitment_day }}">{{ employee.recruitment_day }}</td>
-                    <td data-bs-toggle="tooltip" title="{{ employee.date_of_joining_the_police }}">{{ employee.date_of_joining_the_police }}</td>
-                    <td data-bs-toggle="tooltip" title="{{ employee.recruitment_place }}">{{ employee.recruitment_place }}</td>
-                    <td data-bs-toggle="tooltip" title="{{ employee.recruitment_source }}">{{ employee.recruitment_source }}</td>
-                    <td data-bs-toggle="tooltip" title="{{ employee.blood_type }}">{{ employee.blood_type }}</td>
-                    <td data-bs-toggle="tooltip" title="{{ employee.appellation }}">{{ employee.appellation }}</td>
-                    <td data-bs-toggle="tooltip" title="{{ employee.keep_records }}">{{ employee.keep_records }}</td>
-                    <td data-bs-toggle="tooltip" title="{{ employee.forte_ability }}">{{ employee.forte_ability }}</td>
-                    <td data-bs-toggle="tooltip" title="{{ employee.Descriptions }}">{{ employee.Descriptions }}</td>
-                    <td class="action-col sticky-edit">
-                        <a href="{% url 'employee:edit_employee' employee.id %}" class="btn btn-sm btn-warning" title="Sửa">
-                            <i class="fa-solid fa-pen-to-square"></i>
-                        </a>
-                    </td>
-                    <td class="action-col sticky-delete">
-                        <form action="{% url 'employee:delete_employee' employee.id %}" method="post">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Bạn có chắc chắn muốn xóa')" title="Xóa">
-                                <i class="fa-solid fa-trash"></i>
-                            </button>
-                        </form>
-                    </td>
-                </tr>
+
+    <div class="container-fluid table-area">
+            <div class = "table-wrap">
+            <!-- Bảng dữ liệu: cuộn ngang -->
+            <div class="table-scroll">
+                <table class="table table-data table-hover table-master table-bordered mt-3 text-center resizable-table">
+                    <thead class="head-blue">
+                        <tr>
+                            <th>
+                                <span class="th-ellipsis">Số hiệu</span>
+                                <div class="col-resizer"></div>
+                            </th>
+                            <th class="col-fullname">
+                                <span class="th-ellipsis">Họ và tên</span>
+                                <div class="col-resizer"></div>
+                            </th>
+                            <th>
+                                <span class="th-ellipsis">Ngày sinh</span>
+                                <div class="col-resizer"></div>
+                            </th>
+                            <th>
+                                <span class="th-ellipsis">Giới tính</span>
+                                <div class="col-resizer"></div>
+                            </th>
+                            <th>
+                                <span class="th-ellipsis">Quê quán</span>
+                                <div class="col-resizer"></div>
+                            </th>
+                            <th>
+                                <span class="th-ellipsis">Nơi cư trú hiện tại</span>
+                                <div class="col-resizer"></div>
+                            </th>
+                            <th>
+                                <span class="th-ellipsis">Dân tộc</span>
+                                <div class="col-resizer"></div>
+                            </th>
+                            <th>
+                                <span class="th-ellipsis">Tôn giáo</span>
+                                <div class="col-resizer"></div>
+                            </th>
+                            <th>
+                                <span class="th-ellipsis">Nghề nghiệp của gia đình</span>
+                                <div class="col-resizer"></div>
+                            </th>
+                            <th>
+                                <span class="th-ellipsis">Công việc trước đây</span>
+                                <div class="col-resizer"></div>
+                            </th>
+                            <th>
+                                <span class="th-ellipsis">Ngày vào đoàn</span>
+                                <div class="col-resizer"></div>
+                            </th>
+                            <th>
+                                <span class="th-ellipsis">Đoàn viên</span>
+                                <div class="col-resizer"></div>
+                            </th>
+                            <th>
+                                <span class="th-ellipsis">Ngày vào Đảng</span>
+                                <div class="col-resizer"></div>
+                            </th>
+                            <th>
+                                <span class="th-ellipsis">Ngày chính thức</span>
+                                <div class="col-resizer"></div>
+                            </th>
+                            <th>
+                                <span class="th-ellipsis">Ngày tuyển dụng</span>
+                                <div class="col-resizer"></div>
+                            </th>
+                            <th>
+                                <span class="th-ellipsis">Ngày vào công an</span>
+                                <div class="col-resizer"></div>
+                            </th>
+                            <th>
+                                <span class="th-ellipsis">Nơi tuyển dụng</span>
+                                <div class="col-resizer"></div>
+                            </th>
+                            <th>
+                                <span class="th-ellipsis">Nguồn tuyển dụng</span>
+                                <div class="col-resizer"></div>
+                            </th>
+                            <th>
+                                <span class="th-ellipsis">Nhóm máu</span>
+                                <div class="col-resizer"></div>
+                            </th>
+                            <th>
+                                <span class="th-ellipsis">Danh hiệu được phong</span>
+                                <div class="col-resizer"></div>
+                            </th>
+                            <th>
+                                <span class="th-ellipsis">Địa chỉ hồ sơ</span>
+                                <div class="col-resizer"></div>
+                            </th>
+                            <th>
+                                <span class="th-ellipsis">Năng lực nổi bật</span>
+                                <div class="col-resizer"></div>
+                            </th>
+                            <th>
+                                <span class="th-ellipsis">Mô tả</span>
+                                <div class="col-resizer"></div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for employee in employees %}
+                        <tr>
+                            <td data-bs-toggle="tooltip" title="{{ employee.emp_num }}">{{ employee.emp_num }}</td>
+                            <td class = "col-fullname">{{ employee.full_name }}</td>
+                            <td data-bs-toggle="tooltip" title="{{ employee.day_of_birth }}">{{ employee.day_of_birth }}</td>
+                            <td data-bs-toggle="tooltip" title="{{ employee.get_gender_display }}">{{ employee.get_gender_display }}</td>
+                            <td data-bs-toggle="tooltip" title="{{ employee.place_of_hometown }}">{{ employee.place_of_hometown }}</td>
+                            <td data-bs-toggle="tooltip" title="{{ employee.current_residence }}">{{ employee.current_residence }}</td>
+                            <td data-bs-toggle="tooltip" title="{{ employee.nation }}">{{ employee.nation }}</td>
+                            <td data-bs-toggle="tooltip" title="{{ employee.religion }}">{{ employee.religion }}</td>
+                            <td data-bs-toggle="tooltip" title="{{ employee.family_job }}">{{ employee.family_job }}</td>
+                            <td data-bs-toggle="tooltip" title="{{ employee.before_job }}">{{ employee.before_job }}</td>
+                            <td data-bs-toggle="tooltip" title="{{ employee.date_in_group }}">{{ employee.date_in_group }}</td>
+                            <td data-bs-toggle="tooltip" title="{{ employee.get_union_display }}">{{ employee.get_union_display }}</td>
+                            <td data-bs-toggle="tooltip" title="{{ employee.day_of_joining_the_party }}">{{ employee.day_of_joining_the_party }}</td>
+                            <td data-bs-toggle="tooltip" title="{{ employee.day_offical }}">{{ employee.day_offical }}</td>
+                            <td data-bs-toggle="tooltip" title="{{ employee.recruitment_day }}">{{ employee.recruitment_day }}</td>
+                            <td data-bs-toggle="tooltip" title="{{ employee.date_of_joining_the_police }}">{{ employee.date_of_joining_the_police }}</td>
+                            <td data-bs-toggle="tooltip" title="{{ employee.recruitment_place }}">{{ employee.recruitment_place }}</td>
+                            <td data-bs-toggle="tooltip" title="{{ employee.recruitment_source }}">{{ employee.recruitment_source }}</td>
+                            <td data-bs-toggle="tooltip" title="{{ employee.blood_type }}">{{ employee.blood_type }}</td>
+                            <td data-bs-toggle="tooltip" title="{{ employee.appellation }}">{{ employee.appellation }}</td>
+                            <td data-bs-toggle="tooltip" title="{{ employee.keep_records }}">{{ employee.keep_records }}</td>
+                            <td data-bs-toggle="tooltip" title="{{ employee.forte_ability }}">{{ employee.forte_ability }}</td>
+                            <td data-bs-toggle="tooltip" title="{{ employee.Descriptions }}">{{ employee.Descriptions }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <!-- Bảng action: đứng riêng, không cuộn ngang -->
+            <div class="table-actions table-action">
+                    <table class="table table-hover table-bordered mt-3 text-center table-action">
+                        <thead class="head-blue">
+                            <tr>
+                            <th></th>
+                            <th></th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for employee in employees %}
+                            <tr>
+                            <td>
+                                <a href="{% url 'employee:edit_employee' employee.id %}" class="btn btn-sm btn-warning" title="Sửa">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                                </a>
+                            </td>
+                            <td>
+                                <form action="{% url 'employee:delete_employee' employee.id %}" method="post">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-danger"
+                                        onclick="return confirm('Bạn có chắc chắn muốn xóa')" title="Xóa">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                                </form>
+                            </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="table-pagination">
+                {% if page_obj.has_previous %}
+                    <a class="pg" href="?page=1">&laquo;</a>
+                    <a class="pg" href="?page={{ page_obj.previous_page_number }}">&lsaquo;</a>
+                {% endif %}
+
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                    <span class="pg active">{{ num }}</span>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <a class="pg" href="?page={{ num }}">{{ num }}</a>
+                    {% endif %}
                 {% endfor %}
-            </tbody>
-        </table>
-</div>
+
+                {% if page_obj.paginator %}
+                    <a class="pg" href="?page={{ page_obj.paginator.num_pages }}">&raquo;</a>
+                {% endif %}
+                {% if page_obj.has_next %}
+                    <a class="pg" href="?page={{ page_obj.next_page_number }}">&rsaquo;</a>
+                    <a class="pg" href="?page={{ page_obj.paginator.num_pages }}">&raquo;</a>
+                {% endif %}
+            </div>
+    </div>
 {% endblock %}

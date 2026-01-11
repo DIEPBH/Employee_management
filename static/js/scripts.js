@@ -107,3 +107,38 @@ document.addEventListener("DOMContentLoaded", function () {
         return new bootstrap.Tooltip(tooltipTriggerEl);
     });
 });
+
+
+
+//Đồng bộ bảng action với bảng chính
+function syncActionTableRows() {
+    const dataTable = document.querySelector('.table-data');
+    const actionTable = document.querySelector('.table-action');
+    if (!dataTable || !actionTable) return;
+
+    /* Đồng bộ header */
+    const dataHead = dataTable.querySelector('thead tr');
+    const actionHead = actionTable.querySelector('thead tr');
+    if (dataHead && actionHead) {
+      actionHead.style.height = dataHead.offsetHeight + 'px';
+    }
+
+    /* Đồng bộ từng dòng body */
+    const dataRows = dataTable.querySelectorAll('tbody tr');
+    const actionRows = actionTable.querySelectorAll('tbody tr');
+
+    const rowCount = Math.min(dataRows.length, actionRows.length);
+    for (let i = 0; i < rowCount; i++) {
+      actionRows[i].style.height = dataRows[i].offsetHeight + 'px';
+    }
+  }
+  /* Chạy khi load trang */
+  window.addEventListener('load', syncActionTableRows);
+
+  /* Chạy khi resize màn hình */
+  window.addEventListener('resize', syncActionTableRows);
+
+  /* Nếu có kéo resize cột */
+  document.addEventListener('mouseup', () => {
+    setTimeout(syncActionTableRows, 0);
+  });

@@ -11247,6 +11247,7 @@ body {
     display: flex;
     min-height: 100vh;
     transition: all 0.25s ease;
+    width: 100%;
 }
 
 #sidebar-wrapper {
@@ -11279,137 +11280,208 @@ body {
     width: 100%;
     flex-grow: 1;
     overflow-x: hidden;
+    flex: 1 1 auto;
+    min-width: 0;
 }
 
 #wrapper.toggled #sidebar-wrapper {
     margin-left: -250px;
 }
 
-/* ===== TABLE CÁN BỘ ===== */
-.table-canbo {
-    table-layout: fixed;   /* Bắt buộc để ellipsis hoạt động */
-    width: 100%;
-    min-width: 2800px;
-    border-collapse: separate;
-    border-spacing: 0;
+/* =========================================================
+   TABLE MASTER (DATA TABLE)
+   ========================================================= */
+.table-master{
+  table-layout: fixed;
+  width: 100%;
+  min-width: 2800px;
+  border-collapse: separate;
+  border-spacing: 0;
 }
 
-.table-canbo th,
-.table-canbo td {
-    white-space: nowrap;       /* Không xuống dòng */
-    overflow: hidden;          /* Ẩn phần tràn */
-    text-overflow: ellipsis;   /* Hiện ... */
-    vertical-align: middle;    /* Căn giữa theo chiều dọc */
-    text-align: center;        /* Căn giữa ngang */
-    max-width: 300px;          /* Giới hạn độ rộng mỗi cột */
-    background-clip: padding-box;
+.table-master th,
+.table-master td{
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+  text-align: center;
+  max-width: 300px;
+  background-clip: padding-box;
 }
 
-/* Riêng tiêu đề đậm hơn */
-.table-canbo thead th {
-    font-weight: 600;
-    background-color: #e9f3ff;
+/* Header */
+.table-master thead th{
+  font-weight: 600;
+  background-color: #e9f3ff;
 }
 
-/* ===== RESIZABLE TABLE COLUMNS ===== */
-.resizable-table th {
-    position: relative;
+/* Cột Họ và tên không ellipsis */
+.table-master th:nth-child(2),
+.table-master td:nth-child(2){
+  text-overflow: unset;
 }
 
-.col-resizer {
-    position: absolute;
-    right: 0;
-    top: 0;
-    width: 5px;
-    height: 100%;
-    cursor: col-resize;
-    user-select: none;
+/* =========================================================
+   RESIZABLE COLUMNS
+   ========================================================= */
+.resizable-table th{ position: relative; }
+
+.col-resizer{
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 5px;
+  height: 100%;
+  cursor: col-resize;
+  user-select: none;
 }
 
-
-.table-scroll {
-    width: 100%;
-    overflow-x: auto;
-    position: relative;
+/* =========================================================
+   LAYOUT 2 BẢNG: DATA + ACTION
+   ========================================================= */
+.table-wrap{
+  display: flex;
+  width: 100%;
+  align-items: stretch;
 }
 
-/* Cột Họ và tên */
-.table-canbo th:nth-child(2),
-.table-canbo td:nth-child(2) {
-    text-overflow: unset;
+/* Data table cuộn ngang */
+.table-scroll{
+  flex: 1;
+  overflow-x: auto;
+  overflow-y: hidden;
+  position: relative;
 }
 
-
-/* ===== WRAPPER CUỘN NGANG ===== */
-.table-scroll {
-    width: 100%;
-    overflow-x: auto;
-    position: relative;
-}
-/* Wrapper cuộn */
-.table-scroll {
-    position: relative;
-    overflow-x: auto;
+/* =========================================================
+   ACTION TABLE (SỬA / XÓA)
+   ========================================================= */
+.table-actions{
+  flex: 0 0 auto;
+  position: sticky;
+  right: 0;
+  background: transparent;
+  z-index: 100;
 }
 
-/* Action columns nền đặc */
-.action-col {
-    background-color: #ffffff !important;
+/* Xóa toàn bộ border & line bootstrap */
+.table-action,
+.table-action *{
+  border: none !important;
 }
 
-/* CỘT SỬA */
-.sticky-edit {
-    position: sticky;
-    right: 90px;
-    z-index: 50;
-    background-color: #ffffff !important;
-    box-shadow: -2px 0 5px rgba(0,0,0,0.08); /* bóng mờ bên trái */
+/* Header action: trong suốt */
+.table-action thead th{
+  background: transparent !important;
+  font-weight: 500;
+  color: #555;
 }
 
-/* CỘT XÓA */
-.sticky-delete {
-    position: sticky;
-    right: 0;
-    z-index: 60;
-    background-color: #ffffff !important;
-    box-shadow: -2px 0 5px rgba(0,0,0,0.08);
+/* Ô action cố định width */
+.table-action th,
+.table-action td{
+  width: 56px;
+  min-width: 56px;
+  max-width: 56px;
+  padding: 0 !important;
+  text-align: center;
+  vertical-align: middle;
+  white-space: nowrap;
 }
 
-/* HEADER */
-thead th.sticky-edit {
-    position: sticky;
-    right: 90px;
-    z-index: 70;
-    background-color: #e9f3ff !important;
+/* Bỏ hover & background dòng */
+.table-action tbody tr,
+.table-action.table-hover tbody tr:hover{
+  background: transparent !important;
 }
 
-thead th.sticky-delete {
-    position: sticky;
-    right: 0;
-    z-index: 80;
-    background-color: #e9f3ff !important;
+/* Canh giữa nội dung trong ô */
+.table-action td > a,
+.table-action td > form{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  margin: 0;
 }
-
-/* Chặn xuyên chữ */
-.table-canbo th,
-.table-canbo td {
-    background-clip: padding-box;
-}
-/* Ẩn border */
-.table-canbo th.sticky-edit,
-.table-canbo td.sticky-edit,
-.table-canbo th.sticky-delete,
-.table-canbo td.sticky-delete {
-    border: none !important;
-}
-
 
 /* Nút icon */
-.btn-icon {
-    padding: 4px 6px;
-    width: auto;
+.table-action .btn{
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.btn-icon i {
-    font-size: 14px;
+.table-action td form{ margin: 0; }
+
+
+/* =========================================================
+   PHÂN TRANG BẢNG MASTER (SỬA / XÓA)
+   ========================================================= */
+
+   /* Khối chứa cả bảng + phân trang: full chiều ngang vùng content */
+.table-area{
+  width: 100%;
+}
+
+/* 2 bảng phải stretch full chiều ngang */
+.table-wrap{
+  display: flex;
+  width: 100%;
+  align-items: stretch;
+}
+
+/* phần cuộn luôn chiếm hết phần còn lại */
+.table-scroll{
+  flex: 1 1 auto;
+  min-width: 0;            /* QUAN TRỌNG: tránh flex bị tràn làm co layout */
+}
+
+/* bảng dữ liệu: vẫn rộng theo nội dung để cuộn ngang */
+.table-master{
+  width: max-content;      /* bảng rộng theo số cột */
+  min-width: 100%;         /* nhưng nếu ít cột vẫn phủ full */
+}
+
+/* khối action giữ đúng chiều rộng nhỏ */
+.table-actions{
+  flex: 0 0 auto;
+}
+
+.table-pagination{
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;   /* đẩy sang phải */
+  gap: 8px;
+  padding: 10px 0;
+}
+
+.table-pagination .pg{
+  width: 34px;
+  height: 34px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  color: #333;
+  background: #fff;
+  font-size: 14px;
+}
+
+.table-pagination .pg.active{
+  background: #0d6efd; /* xanh bootstrap */
+  color: #fff;
+  border-color: #0d6efd;
+  font-weight: 600;
+}
+
+.table-pagination .pg:hover{
+  background: rgba(13,110,253,0.08);
 }

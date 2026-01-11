@@ -9,14 +9,19 @@ from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required, permission_required
 from datetime import datetime
 from django.db.models import Q
+from django.core.paginator import Paginator
 # Create your views here.
 
 @login_required
 def index(request):
     if request.user.is_authenticated:
         employees = Emp_information.objects.all()
-        return render(request, 'employee/index.html', {'employees': employees})
-    
+        paginator = Paginator(employees, 1)  # Hiển thị 1 nhân viên trên mỗi trang
+        page_number = request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+
+        return render(request, 'employee/index.html', {'employees': page_obj, 'page_obj': page_obj})
+
 @login_required
 def add_employee(request):
     if request.method == 'POST':
