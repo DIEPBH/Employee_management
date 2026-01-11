@@ -11485,3 +11485,60 @@ body {
 .table-pagination .pg:hover{
   background: rgba(13,110,253,0.08);
 }
+
+/* ===== SEARCH PANEL (NHIỀU TRƯỜNG) ===== */
+.search-panel{
+  width: 100%;
+  padding: 12px;
+  background: #fff;
+  border: 1px solid #e6e6e6;
+  border-radius: 10px;
+  position: relative;
+}
+
+.search-grid{
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.search-item{
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.search-label{
+  font-size: 13px;
+  font-weight: 600;
+  color: #333;
+}
+
+.search-control{
+  height: 40px;
+  padding: 0 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.search-control:focus{
+  outline: none;
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 2px rgba(13,110,253,0.15);
+}
+
+.search-actions{
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+  justify-content: flex-end;
+}
+
+/* Responsive: màn hình nhỏ tự xuống dòng */
+@media (max-width: 1200px){
+  .search-grid{ grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 768px){
+  .search-grid{ grid-template-columns: repeat(1, minmax(0, 1fr)); }
+}

@@ -3,7 +3,54 @@
     <div class="container-fluid bg-success text-white text-center">
         <h1>TRA CỨU THÔNG TIN CÁN BỘ</h1>
     </div>
-    
+    <!-- Khu vực tìm kiếm -->
+        <div class="container-fluid mt-3 px-0">
+            <form method="get" class="search-panel">
+                <div class="search-grid">
+                <div class="search-item">
+                    <label class="search-label">Số hiệu</label>
+                    <input type="text" name="emp_num" class="search-control"
+                        value="{{ request.GET.emp_num|default:'' }}" placeholder="Nhập số hiệu">
+                </div>
+
+                <div class="search-item">
+                    <label class="search-label">Họ và tên</label>
+                    <input type="text" name="full_name" class="search-control"
+                        value="{{ request.GET.full_name|default:'' }}" placeholder="VD: Nhập họ và tên">
+                </div>
+
+                <div class="search-item">
+                    <label class="search-label">Ngày sinh</label>
+                    <input type="date" name="dob" class="search-control"
+                        value="{{ request.GET.dob|default:'' }}">
+                </div>
+
+                <div class="search-item">
+                    <label class="search-label">Giới tính</label>
+                    <select name="gender" class="search-control">
+                    <option value="">-- Tất cả --</option>
+                    <option value="M" {% if request.GET.gender == "M" %}selected{% endif %}>Nam</option>
+                    <option value="F" {% if request.GET.gender == "F" %}selected{% endif %}>Nữ</option>
+                    </select>
+                </div>
+
+                <div class="search-item">
+                    <label class="search-label">Quê quán</label>
+                    <input type="text" name="hometown" class="search-control"
+                        value="{{ request.GET.hometown|default:'' }}" placeholder="Nhập quê quán">
+                </div>
+                </div>
+
+                <div class="search-actions">
+                <button type="submit" class="btn btn-primary">Tìm kiếm</button>
+
+                <!-- Nút reset: quay về trang index không có query -->
+                <a href="{% url 'employee:index' %}" class="btn btn-outline-secondary">Xóa lọc</a>
+                </div>
+            </form>
+    </div>
+
+    <!-- Nút thêm mới -->
     <div class = "row">
         <div class = "col"></div>
         <div class = "col"></div>
@@ -12,6 +59,8 @@
         <div class = "col"><a href="{% url 'employee:add_employee' %}" class="btn btn-primary mt-3">Thêm mới thông tin cán bộ</a></div>
     </div>
 
+    <!-- Khu vực bảng dữ liệu -->
+    
     <div class="container-fluid table-area">
             <div class = "table-wrap">
             <!-- Bảng dữ liệu: cuộn ngang -->
@@ -118,7 +167,7 @@
                         <tr>
                             <td data-bs-toggle="tooltip" title="{{ employee.emp_num }}">{{ employee.emp_num }}</td>
                             <td class = "col-fullname">{{ employee.full_name }}</td>
-                            <td data-bs-toggle="tooltip" title="{{ employee.day_of_birth }}">{{ employee.day_of_birth }}</td>
+                            <td data-bs-toggle="tooltip" title="{{ employee.day_of_birth }}">{{ employee.day_of_birth|date:"d/m/Y"|default_if_none:"" }}</td>
                             <td data-bs-toggle="tooltip" title="{{ employee.get_gender_display }}">{{ employee.get_gender_display }}</td>
                             <td data-bs-toggle="tooltip" title="{{ employee.place_of_hometown }}">{{ employee.place_of_hometown }}</td>
                             <td data-bs-toggle="tooltip" title="{{ employee.current_residence }}">{{ employee.current_residence }}</td>
@@ -126,12 +175,12 @@
                             <td data-bs-toggle="tooltip" title="{{ employee.religion }}">{{ employee.religion }}</td>
                             <td data-bs-toggle="tooltip" title="{{ employee.family_job }}">{{ employee.family_job }}</td>
                             <td data-bs-toggle="tooltip" title="{{ employee.before_job }}">{{ employee.before_job }}</td>
-                            <td data-bs-toggle="tooltip" title="{{ employee.date_in_group }}">{{ employee.date_in_group }}</td>
+                            <td data-bs-toggle="tooltip" title="{{ employee.date_in_group }}">{{ employee.date_in_group|date:"d/m/Y"|default_if_none:"" }}</td>
                             <td data-bs-toggle="tooltip" title="{{ employee.get_union_display }}">{{ employee.get_union_display }}</td>
-                            <td data-bs-toggle="tooltip" title="{{ employee.day_of_joining_the_party }}">{{ employee.day_of_joining_the_party }}</td>
-                            <td data-bs-toggle="tooltip" title="{{ employee.day_offical }}">{{ employee.day_offical }}</td>
-                            <td data-bs-toggle="tooltip" title="{{ employee.recruitment_day }}">{{ employee.recruitment_day }}</td>
-                            <td data-bs-toggle="tooltip" title="{{ employee.date_of_joining_the_police }}">{{ employee.date_of_joining_the_police }}</td>
+                            <td data-bs-toggle="tooltip" title="{{ employee.day_of_joining_the_party }}">{{ employee.day_of_joining_the_party|date:"d/m/Y"|default_if_none:"" }}</td>
+                            <td data-bs-toggle="tooltip" title="{{ employee.day_offical }}">{{ employee.day_offical|date:"d/m/Y"|default_if_none:"" }}</td>
+                            <td data-bs-toggle="tooltip" title="{{ employee.recruitment_day }}">{{ employee.recruitment_day|date:"d/m/Y"|default_if_none:"" }}</td>
+                            <td data-bs-toggle="tooltip" title="{{ employee.date_of_joining_the_police }}">{{ employee.date_of_joining_the_police|date:"d/m/Y"|default_if_none:"" }}</td>
                             <td data-bs-toggle="tooltip" title="{{ employee.recruitment_place }}">{{ employee.recruitment_place }}</td>
                             <td data-bs-toggle="tooltip" title="{{ employee.recruitment_source }}">{{ employee.recruitment_source }}</td>
                             <td data-bs-toggle="tooltip" title="{{ employee.blood_type }}">{{ employee.blood_type }}</td>
@@ -180,24 +229,21 @@
 
             <div class="table-pagination">
                 {% if page_obj.has_previous %}
-                    <a class="pg" href="?page=1">&laquo;</a>
-                    <a class="pg" href="?page={{ page_obj.previous_page_number }}">&lsaquo;</a>
+                    <a class="pg" href="?page=1{% if querystring %}&{{ querystring }}{% endif %}">&laquo;</a>
+                    <a class="pg" href="?page={{ page_obj.previous_page_number }}{% if querystring %}&{{ querystring }}{% endif %}">&lsaquo;</a>
                 {% endif %}
 
                 {% for num in page_obj.paginator.page_range %}
                     {% if page_obj.number == num %}
                     <span class="pg active">{{ num }}</span>
                     {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-                    <a class="pg" href="?page={{ num }}">{{ num }}</a>
+                    <a class="pg" href="?page={{ num }}{% if querystring %}&{{ querystring }}{% endif %}">{{ num }}</a>
                     {% endif %}
                 {% endfor %}
 
-                {% if page_obj.paginator %}
-                    <a class="pg" href="?page={{ page_obj.paginator.num_pages }}">&raquo;</a>
-                {% endif %}
                 {% if page_obj.has_next %}
-                    <a class="pg" href="?page={{ page_obj.next_page_number }}">&rsaquo;</a>
-                    <a class="pg" href="?page={{ page_obj.paginator.num_pages }}">&raquo;</a>
+                    <a class="pg" href="?page={{ page_obj.next_page_number }}{% if querystring %}&{{ querystring }}{% endif %}">&rsaquo;</a>
+                    <a class="pg" href="?page={{ page_obj.paginator.num_pages }}{% if querystring %}&{{ querystring }}{% endif %}">&raquo;</a>
                 {% endif %}
             </div>
     </div>
