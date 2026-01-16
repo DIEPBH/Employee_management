@@ -1,3 +1,4 @@
+
 /*!
     * Start Bootstrap - SB Admin v7.0.7 (https://startbootstrap.com/template/sb-admin)
     * Copyright 2013-2023 Start Bootstrap
@@ -113,7 +114,7 @@ document.addEventListener("DOMContentLoaded", function () {
 //Đồng bộ bảng action với bảng chính
 function syncActionTableRows() {
     const dataTable = document.querySelector('.table-data');
-    const actionTable = document.querySelector('.table-action');
+    const actionTable = document.querySelector('.table-actions table.table-action');
     if (!dataTable || !actionTable) return;
 
     /* Đồng bộ header */
@@ -142,3 +143,15 @@ function syncActionTableRows() {
   document.addEventListener('mouseup', () => {
     setTimeout(syncActionTableRows, 0);
   });
+  document.addEventListener("DOMContentLoaded", () => {
+  document.addEventListener("click", (e) => {
+    const btn = e.target.closest(".js-open-modal");
+    if (!btn) return;
+
+    const url = btn.dataset.url;
+    const title = btn.dataset.title || "";
+    const type = btn.dataset.type || "";
+
+    window.openAppModal(url, { title, type, reloadOnSuccess: true });
+  });
+});

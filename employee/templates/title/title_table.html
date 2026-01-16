@@ -1,0 +1,33 @@
+<table class="table table-hover align-middle">
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Chức danh</th>
+      <th>Phụ cấp</th>
+      <th>Ngày nhận</th>
+      <th>Số QĐ</th>
+      <th>Ngày QĐ</th>
+      <th>Ngày dừng</th>
+      <th class="text-end">Thao tác</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for t in titles %}
+      <tr>
+        <td>{{ forloop.counter }}</td>
+        <td>{{ t.emp_title }}</td>
+        <td>{{ t.allowances }}</td>
+        <td>{{ t.date_of_receipt|date:"d/m/Y" }}</td>
+        <td>{{ t.decision_number }}</td>
+        <td>{{ t.decision_date|date:"d/m/Y" }}</td>
+        <td>{{ t.stop_decision_date|date:"d/m/Y" }}</td>
+        <td class="text-end">
+          <button class="btn btn-sm btn-warning js-title-edit" data-id="{{ t.id }}">Sửa</button>
+          <button class="btn btn-sm btn-danger js-title-del" data-id="{{ t.id }}">Xóa</button>
+        </td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="8" class="text-center text-muted">Chưa có chức danh</td></tr>
+    {% endfor %}
+  </tbody>
+</table>

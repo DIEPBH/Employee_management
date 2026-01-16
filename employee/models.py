@@ -1,9 +1,11 @@
+from tracemalloc import start
 from django.db import models
 from django.conf import settings
 from django.dispatch import receiver
 from django.db.models.signals import post_delete, pre_save
 import os
-
+from django.core.exceptions import ValidationError
+from django.db.models import Q
 # Create your models here.
 #Bảng phân quyền người dùng theo đơn vị
 class usercompany(models.Model):
@@ -128,16 +130,42 @@ class Emp_information(models.Model):
 class Emp_Title(models.Model):
     id = models.AutoField(primary_key=True)
     emp = models.ForeignKey(Emp_information,to_field='emp_num',db_column='emp_num', on_delete=models.CASCADE, verbose_name="Nhân viên", default='')
-    emp_title = models.CharField("Chức danh",max_length=100, unique=True, null=False)
+    emp_title = models.ForeignKey(position, on_delete=models.CASCADE, verbose_name="Chức danh", default='')
     allowances = models.DecimalField("Phụ cấp", max_digits=10, decimal_places=2, null=False)
     date_of_receipt = models.DateField("Ngày nhận chức danh",null=False)
     form_of_appointment = models.CharField("Hình thức bổ nhiệm",max_length=100, null=False)
     decision_number = models.CharField("Số quyết định",max_length=100, null=False)
     decision_date = models.DateField("Ngày quyết định",null=False)
-    stop_decision_date = models.DateField("Ngày dừng quyết định",null=False)
+    stop_decision_date = models.DateField("Ngày dừng quyết định",null=True)
+    is_active = models.BooleanField("Hiệu lực", default='')
+    file = models.FileField("File đính kèm",upload_to='employee_titles/', null=True, blank=True)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, verbose_name="Người tạo")
+    created_at = models.DateTimeField("Ngày tạo", auto_now_add=True)
 
-    def __str__(self):
-        return self.emp_title
+    # kiểm soát không overlap chức danh cho cùng 1 nhân viên
+    def clean(self):
+        super().clean()
+        start = self.decision_date
+        end = self.stop_decision_date
+
+        if end and end < start:
+            raise ValidationError("Ngày dừng quyết định >= ngày quyết định")
+        qs = Emp_Title.objects.filter(emp=self.emp).exclude(id=self.id)
+
+    # Overlap condition:
+    # [start, end] giao nhau với [a, b]
+    # end null => b = +inf
+        if end:
+            qs = qs.filter(
+                Q(stop_decision_date__isnull=True, decision_date__lte=end) |
+                Q(stop_decision_date__isnull=False, decision_date__lte=end, stop_decision_date__gte=start)
+            )
+        else:
+            qs = qs.filter(Q(stop_decision_date__isnull=True) | Q(stop_decision_date__gte=start))
+        if qs.exists():
+            raise ValidationError("Khoảng thời gian chức danh bị chồng lấn với bản ghi khác.")
+        def __str__(self):
+            return self.emp_title
 
 #3 Bảng thông tin quy hoạch chức vụ của nhân viên
 class Emp_Position(models.Model):

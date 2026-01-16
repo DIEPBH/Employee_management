@@ -1,0 +1,209 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div class="container-fluid page-header">
+        <i class="fa-solid fa-users me-2"></i>
+        <h1>TRA CỨU THÔNG TIN CÁN BỘ</h1>
+    </div>
+    <!-- Khu vực tìm kiếm -->
+        <div class="container-fluid mt-3 px-0" id="search-panel-wrapper">
+            <div class="search-panel" id="search-panel">
+                <button type="button"
+                    id="toggle-search"
+                    class="search-toggle"
+                    aria-label="Ẩn/Hiện điều kiện">
+                    ^
+                </button>
+                <form method="get" class="search-form">
+                    <div class="search-grid">
+                        <div class="search-item">
+                            <label class="search-label">Số hiệu</label>
+                            <input type="text" name="emp_num" class="search-control"
+                                value="{{ request.GET.emp_num|default:'' }}" placeholder="Nhập số hiệu">
+                        </div>
+
+                        <div class="search-item">
+                            <label class="search-label">Họ và tên</label>
+                            <input type="text" name="full_name" class="search-control"
+                                value="{{ request.GET.full_name|default:'' }}" placeholder="Nhập họ và tên">
+                        </div>
+
+                        <div class="search-item">
+                            <label class="search-label">Số quyết định</label>
+                            <input type="text" name="decision_number" class="search-control"
+                                value="{{ request.GET.decision_number|default:'' }}" placeholder="Nhập số quyết định">
+                        </div>
+
+                        <div class="search-item">
+                            <label class="search-label">Ngày quyết định</label>
+                            <input type="text" name="hometown" class="search-control"
+                                value="{{ request.GET.hometown|default:'' }}" placeholder="Nhập quê quán">
+                        </div>
+                    </div>
+
+                    <div class="search-actions">
+                    <button type="submit" class="btn btn-primary">Tìm kiếm</button>
+
+                    <!-- Nút reset: quay về trang index không có query -->
+                    <a href="{% url 'employee:index_emp_tile' %}" class="btn btn-outline-secondary">Xóa lọc</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    <!-- Nút thêm mới -->
+    <div class="d-flex justify-content-end align-items-center mt-3">
+        <button
+            class="btn btn-success"
+            data-modal-url="{% url 'employee:title_manager_modal' %}"
+            data-modal-title="Thêm mới thông tin chức danh"
+            data-modal-type="employee">
+            <i class="fa-solid fa-plus me-2"></i> Thêm mới
+        </button>
+    </div>
+
+
+
+    <!-- Khu vực bảng dữ liệu -->
+    
+    <div class="container-fluid table-area">
+            <div class = "table-wrap">
+            <!-- Bảng dữ liệu: cuộn ngang -->
+            <div class="table-scroll">
+                <table class="table table-data table-hover table-master table-bordered mt-3 text-center resizable-table">
+                    <thead class="head-blue">
+                        <tr>
+                            <th>
+                                <span class="th-ellipsis">Số hiệu</span>
+                                <div class="col-resizer"></div>
+                            </th>
+                            <th class="col-fullname">
+                                <span class="th-ellipsis">Họ và tên</span>
+                                <div class="col-resizer"></div>
+                            </th>
+                            <th>
+                                <span class="th-ellipsis">Chức danh</span>
+                                <div class="col-resizer"></div>
+                            </th>
+                            <th>
+                                <span class="th-ellipsis">Phụ cấp</span>
+                                <div class="col-resizer"></div>
+                            </th>
+                            <th>
+                                <span class="th-ellipsis">Ngày tháng nhận</span>
+                                <div class="col-resizer"></div>
+                            </th>
+                            <th>
+                                <span class="th-ellipsis">Hình thức bổ nhiệm</span>
+                                <div class="col-resizer"></div>
+                            </th>
+                            <th>
+                                <span class="th-ellipsis">Số quyết định</span>
+                                <div class="col-resizer"></div>
+                            </th>
+                            <th>
+                                <span class="th-ellipsis">Ngày quyết định</span>
+                                <div class="col-resizer"></div>
+                            </th>
+                            <th>
+                                <span class="th-ellipsis">Tháng/năm thôi</span>
+                                <div class="col-resizer"></div>
+                            </th>
+                            <th>
+                                <span class="th-ellipsis">Người tạo</span>
+                                <div class="col-resizer"></div>
+                            </th>
+                            <th>
+                                <span class="th-ellipsis">Ngày tạo</span>
+                                <div class="col-resizer"></div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for title in titles %}
+                        <tr>
+                            <td data-bs-toggle="tooltip" title="{{ title.emp }}">{{ title.emp.emp_num }}</td>
+                            <td class = "col-fullname">{{ title.emp.full_name }}</td>
+                            <td data-bs-toggle="tooltip" title="{{ title.emp_title }}">{{ title.emp_title }}</td>
+                            <td data-bs-toggle="tooltip" title="{{ title.allowances }}">{{ title.allowances }}</td>
+                            <td data-bs-toggle="tooltip" title="{{ title.date_of_receipt }}">{{ title.date_of_receipt|date:"d/m/Y"|default_if_none:"" }}</td>
+                            <td data-bs-toggle="tooltip" title="{{ title.form_of_appointment }}">{{ title.form_of_appointment }}</td>
+                            <td data-bs-toggle="tooltip" title="{{ title.decision_number }}">{{ title.decision_number }}</td>
+                            <td data-bs-toggle="tooltip" title="{{ title.decision_date }}">{{ title.decision_date|date:"d/m/Y"|default_if_none:"" }}</td>
+                            <td data-bs-toggle="tooltip" title="{{ title.emp.created_by }}">{{ title.created_by }}</td>
+                            <td data-bs-toggle="tooltip" title="{{ title.created_at }}">{{ title.created_at|date:"d/m/Y"|default_if_none:"" }}</td>
+                            <td data-bs-toggle="tooltip" title="{{ title.emp.date_in_group }}">{{ title.emp.date_in_group|date:"d/m/Y"|default_if_none:"" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <!-- Bảng action: đứng riêng, không cuộn ngang -->
+            <div class="table-actions table-action">
+                    <table class="table table-hover table-bordered mt-3 text-center table-action">
+                        <thead class="head-blue">
+                            <tr>
+                            <th></th>
+                            <th></th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for title in titles %}
+                            <tr>
+                            <td>
+                                <button type="button"
+                                    class="btn btn-sm btn-warning btn-edit-employee"
+                                    data-url="#"
+                                    title="Sửa">
+                                    <i class="fa-solid fa-pen-to-square"></i>
+                                </button>
+                            </td>
+                            <td>
+                                <form action="#" method="post">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-danger"
+                                        onclick="return confirm('Bạn có chắc chắn muốn xóa')" title="Xóa">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                                </form>
+                            </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="table-pagination">
+                {% if page_obj.has_previous %}
+                    <a class="pg" href="?page=1{% if querystring %}&{{ querystring }}{% endif %}">&laquo;</a>
+                    <a class="pg" href="?page={{ page_obj.previous_page_number }}{% if querystring %}&{{ querystring }}{% endif %}">&lsaquo;</a>
+                {% endif %}
+
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                    <span class="pg active">{{ num }}</span>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <a class="pg" href="?page={{ num }}{% if querystring %}&{{ querystring }}{% endif %}">{{ num }}</a>
+                    {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                    <a class="pg" href="?page={{ page_obj.next_page_number }}{% if querystring %}&{{ querystring }}{% endif %}">&rsaquo;</a>
+                    <a class="pg" href="?page={{ page_obj.paginator.num_pages }}{% if querystring %}&{{ querystring }}{% endif %}">&raquo;</a>
+                {% endif %}
+            </div>
+    </div>
+<!-- MODAL THÊM / SỬA CHỨC DANH -->
+<div class="modal fade" id="employeeModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="employeeModalTitle">Thêm mới thông tin chức danh</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body" id="employeeModalBody"></div>
+    </div>
+  </div>
+</div>
+{% endblock %}

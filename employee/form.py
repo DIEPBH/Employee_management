@@ -1,9 +1,9 @@
 from django import forms
-from .models import Emp_information
+from .models import Emp_information,Emp_Title
 from datetime import datetime
 from django.core.exceptions import ValidationError
 
-#
+#forms quản lý thông tin cán bộ
 class EmpInformationForm(forms.ModelForm):
     class Meta:
         model = Emp_information
@@ -30,3 +30,39 @@ class EmpInformationForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         if self.instance.pk:
             self.fields['emp_num'].disabled = True
+
+#form thêm mới chức danh cho cán bộ
+class EmpTitleForm(forms.ModelForm):
+    class Meta:
+        model = Emp_Title
+        fields = ['emp','emp_title','allowances','date_of_receipt','form_of_appointment','decision_number','decision_date','stop_decision_date','file']
+        widgets = {
+            'emp_num': forms.TextInput(attrs={'readonly': 'readonly'}),
+            'full_name': forms.TextInput(attrs={'readonly': 'readonly'}),
+            'allowances': forms.NumberInput(attrs={'step': '0.01'}),
+            'date_of_receipt': forms.DateInput(attrs={'type': 'date'}),
+            'decision_date': forms.DateInput(attrs={'type': 'date'}),
+            'stop_decision_date': forms.DateInput(attrs={'type': 'date'}),
+        }
+    def clean_date_of_receipt(self):
+        date_of_receipt = self.cleaned_data.get('date_of_receipt')
+        if date_of_receipt and date_of_receipt > datetime.now().date():
+            raise forms.ValidationError("Ngày nhận chức danh không thể lớn hơn ngày hiện tại.")
+        return date_of_receipt
+    def clean_decision_date(self):
+        decision_date = self.cleaned_data.get('decision_date')
+        if decision_date and decision_date > datetime.now().date():
+            raise forms.ValidationError("Ngày quyết định không thể lớn hơn ngày hiện tại.")
+        return decision_date
+    def clean_stop_decision_date(self):
+        stop_decision_date = self.cleaned_data.get('stop_decision_date')
+        if stop_decision_date and stop_decision_date > datetime.now().date():
+            raise forms.ValidationError("Ngày hết hiệu lực quyết định không thể lớn hơn ngày hiện tại.")
+        return stop_decision_date
+    def clean_stop_decision_date_1(self):
+        stop_decision_date = self.cleaned_data.get('stop_decision_date')
+        decision_date = self.cleaned_data.get('decision_date')
+        if stop_decision_date and stop_decision_date > decision_date:
+            raise forms.ValidationError("Ngày hết hiệu lực quyết định không thể lớn hơn ngày quyết định.")
+        return stop_decision_date
+    

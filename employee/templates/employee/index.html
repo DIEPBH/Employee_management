@@ -1,63 +1,76 @@
 {% extends 'base.html' %}
 {% block content %}
-    <div class="container-fluid bg-success text-white text-center">
+    <div class="container-fluid page-header">
+        <i class="fa-solid fa-users me-2"></i>
         <h1>TRA CỨU THÔNG TIN CÁN BỘ</h1>
     </div>
     <!-- Khu vực tìm kiếm -->
-        <div class="container-fluid mt-3 px-0">
-            <form method="get" class="search-panel">
-                <div class="search-grid">
-                <div class="search-item">
-                    <label class="search-label">Số hiệu</label>
-                    <input type="text" name="emp_num" class="search-control"
-                        value="{{ request.GET.emp_num|default:'' }}" placeholder="Nhập số hiệu">
-                </div>
+        <div class="container-fluid mt-3 px-0" id="search-panel-wrapper">
+            <div class="search-panel" id="search-panel">
+                <button type="button"
+                    id="toggle-search"
+                    class="search-toggle"
+                    aria-label="Ẩn/Hiện điều kiện">
+                    ^
+                </button>
+                <form method="get" class="search-form">
+                    <div class="search-grid">
+                        <div class="search-item">
+                            <label class="search-label">Số hiệu</label>
+                            <input type="text" name="emp_num" class="search-control"
+                                value="{{ request.GET.emp_num|default:'' }}" placeholder="Nhập số hiệu">
+                        </div>
 
-                <div class="search-item">
-                    <label class="search-label">Họ và tên</label>
-                    <input type="text" name="full_name" class="search-control"
-                        value="{{ request.GET.full_name|default:'' }}" placeholder="VD: Nhập họ và tên">
-                </div>
+                        <div class="search-item">
+                            <label class="search-label">Họ và tên</label>
+                            <input type="text" name="full_name" class="search-control"
+                                value="{{ request.GET.full_name|default:'' }}" placeholder="Nhập họ và tên">
+                        </div>
 
-                <div class="search-item">
-                    <label class="search-label">Ngày sinh</label>
-                    <input type="date" name="dob" class="search-control"
-                        value="{{ request.GET.dob|default:'' }}">
-                </div>
+                        <div class="search-item">
+                            <label class="search-label">Ngày sinh</label>
+                            <input type="date" name="dob" class="search-control"
+                                value="{{ request.GET.dob|default:'' }}">
+                        </div>
 
-                <div class="search-item">
-                    <label class="search-label">Giới tính</label>
-                    <select name="gender" class="search-control">
-                    <option value="">-- Tất cả --</option>
-                    <option value="M" {% if request.GET.gender == "M" %}selected{% endif %}>Nam</option>
-                    <option value="F" {% if request.GET.gender == "F" %}selected{% endif %}>Nữ</option>
-                    </select>
-                </div>
+                        <div class="search-item">
+                            <label class="search-label">Giới tính</label>
+                            <select name="gender" class="search-control">
+                            <option value="">-- Tất cả --</option>
+                            <option value="M" {% if request.GET.gender == "M" %}selected{% endif %}>Nam</option>
+                            <option value="F" {% if request.GET.gender == "F" %}selected{% endif %}>Nữ</option>
+                            </select>
+                        </div>
 
-                <div class="search-item">
-                    <label class="search-label">Quê quán</label>
-                    <input type="text" name="hometown" class="search-control"
-                        value="{{ request.GET.hometown|default:'' }}" placeholder="Nhập quê quán">
-                </div>
-                </div>
+                        <div class="search-item">
+                            <label class="search-label">Quê quán</label>
+                            <input type="text" name="hometown" class="search-control"
+                                value="{{ request.GET.hometown|default:'' }}" placeholder="Nhập quê quán">
+                        </div>
+                    </div>
 
-                <div class="search-actions">
-                <button type="submit" class="btn btn-primary">Tìm kiếm</button>
+                    <div class="search-actions">
+                    <button type="submit" class="btn btn-primary">Tìm kiếm</button>
 
-                <!-- Nút reset: quay về trang index không có query -->
-                <a href="{% url 'employee:index' %}" class="btn btn-outline-secondary">Xóa lọc</a>
-                </div>
-            </form>
-    </div>
+                    <!-- Nút reset: quay về trang index không có query -->
+                    <a href="{% url 'employee:index' %}" class="btn btn-outline-secondary">Xóa lọc</a>
+                    </div>
+                </form>
+            </div>
+        </div>
 
     <!-- Nút thêm mới -->
-    <div class = "row">
-        <div class = "col"></div>
-        <div class = "col"></div>
-        <div class = "col"></div>
-        <div class = "col"></div>
-        <div class = "col"><a href="{% url 'employee:add_employee' %}" class="btn btn-primary mt-3">Thêm mới thông tin cán bộ</a></div>
+    <div class="d-flex justify-content-end align-items-center mt-3">
+        <button
+            class="btn btn-success js-open-modal"
+            data-modal-url="{% url 'employee:add_employee_modal' %}"
+            data-modal-title="Thêm mới cán bộ"
+            data-modal-type="employee">
+            <i class="fa-solid fa-plus me-2"></i> Thêm mới
+        </button>
     </div>
+
+
 
     <!-- Khu vực bảng dữ liệu -->
     
@@ -207,9 +220,14 @@
                             {% for employee in employees %}
                             <tr>
                             <td>
-                                <a href="{% url 'employee:edit_employee' employee.id %}" class="btn btn-sm btn-warning" title="Sửa">
-                                <i class="fa-solid fa-pen-to-square"></i>
-                                </a>
+                                <button
+                                    class="btn btn-sm btn-warning js-open-modal"
+                                    data-modal-url="{% url 'employee:edit_employee_modal' employee.id %}"
+                                    data-modal-title="Sửa thông tin cán bộ"
+                                    data-modal-type="employee">
+                                    <i class="fa-solid fa-pen-to-square"></i>
+                            </button>
+
                             </td>
                             <td>
                                 <form action="{% url 'employee:delete_employee' employee.id %}" method="post">
@@ -247,4 +265,5 @@
                 {% endif %}
             </div>
     </div>
+
 {% endblock %}

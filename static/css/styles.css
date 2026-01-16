@@ -11500,6 +11500,9 @@ body {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 12px;
+  /* Tự chia cột theo số item và độ rộng màn hình */
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  align-items: end; /* label + input thẳng hàng đáy nhìn gọn */
 }
 
 .search-item{
@@ -11542,3 +11545,247 @@ body {
 @media (max-width: 768px){
   .search-grid{ grid-template-columns: repeat(1, minmax(0, 1fr)); }
 }
+
+
+/* Ẩn hiện điều kiện tìm kiếm */
+/* Nút ^ đè lên border form tìm kiếm */
+.search-toggle{
+  position: absolute;
+  right: 16px;
+  bottom: -14px;          /* vẫn đè lên viền form */
+  width: 32px;
+  height: 32px;
+
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 25px;
+  font-weight: 700;
+  color: #333;            /* có thể đổi #0a8754 cho đồng bộ xanh */
+
+  cursor: pointer;
+  z-index: 20;
+  padding: 0;
+}
+
+.search-toggle:hover{
+  background: #f8f9fa;
+}
+
+#search-panel-wrapper.hidden .search-form{
+  display: none;
+}
+/* Form sẽ là phần accordion */
+.search-form{
+  overflow: hidden;
+  height: auto;                 /* bình thường auto */
+  opacity: 1;
+  transition: height .32s ease, opacity .22s ease;
+  will-change: height, opacity;
+}
+
+/* Khi đang thu gọn */
+.search-form.is-collapsed{
+  height: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ================= HEADER LIỀN MẠCH MENU ================= */
+
+/* Header tiêu đề trang */
+.page-header{
+  background: #0a8754;              /* TRÙNG MÀU MENU */
+  color: #fff;
+  height: 56px;                     /* cùng nhịp với navbar/menu */
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  margin: 0;
+  border-radius: 0;
+}
+
+/* Xóa mọi khoảng hở container bootstrap */
+.page-header.container-fluid{
+  padding-left: 20px !important;
+  padding-right: 20px !important;
+}
+
+/* Tiêu đề */
+.page-header h1{
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: .3px;
+}
+
+/* Content không được đẩy xuống bởi margin */
+#page-content-wrapper > .container-fluid{
+  padding-top: 0;
+}
+@media (min-width: 992px){
+  .page-header{
+    margin-left: 0;   /* đảm bảo không thụt */
+  }
+}
+
+/* ==================== FORM CSS ==================== */
+/* ================= MODAL HEADER xanh nhạt ================= */
+#employeeModal .modal-header{
+  background: #e9f3ff;         /* xanh nhạt */
+  border-bottom: 1px solid #d7e8ff;
+}
+#employeeModal .modal-title{
+  font-weight: 700;
+  color: #134e8a;
+}
+
+/* ================= FORM GRID 4 field / dòng ================= */
+.emp-form-grid{
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px 14px;
+}
+
+.emp-form-item{
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Field full hàng (textarea mô tả...) */
+.emp-form-item--full{
+  grid-column: 1 / -1;
+}
+
+/* Label */
+.emp-form-label{
+  font-size: 13px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+/* Input/select/textarea render từ Django */
+.emp-form-item input,
+.emp-form-item select,
+.emp-form-item textarea{
+  width: 100%;
+  height: 40px;
+  padding: 0 10px;
+  border: 1px solid #cfd4da;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+}
+
+.emp-form-item textarea{
+  height: 110px;
+  padding: 10px;
+  resize: vertical;
+}
+
+/* Focus đẹp */
+.emp-form-item input:focus,
+.emp-form-item select:focus,
+.emp-form-item textarea:focus{
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 2px rgba(13,110,253,.15);
+}
+
+/* Help + error */
+.emp-form-help{
+  font-size: 12px;
+  color: #6c757d;
+}
+.emp-form-error{
+  font-size: 12px;
+  color: #dc3545;
+}
+
+/* Nút dưới cùng */
+.emp-form-actions{
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid #eee;
+}
+
+/* Responsive */
+@media (max-width: 1200px){
+  .emp-form-grid{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 768px){
+  .emp-form-grid{ grid-template-columns: 1fr; }
+}
+
+/* ===================Avatar=================== */
+/* ==== AVATAR UI ==== */
+.avatar-box{
+  border: 1px solid #e6e6e6;
+  border-radius: 10px;
+  padding: 12px;
+  background: #fff;
+}
+
+.avatar-preview{
+  display: grid;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.avatar-preview img{
+  width: 170px;
+  height: 170px;
+  object-fit: cover;
+  border-radius: 12px;
+  border: 1px problematic;
+  border: 1px solid #eee;
+  background: #fafafa;
+}
+
+.avatar-empty{
+  height: 170px;
+  width: 170px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed #d7d7d7;
+  border-radius: 12px;
+  color: #777;
+  background: #fafafa;
+}
+
+.avatar-file{
+  font-size: 13px;
+  color: #0d6efd;
+  text-decoration: none;
+  word-break: break-all;
+}
+
+.avatar-actions{
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+/* Ẩn input file mặc định để dùng label button */
+.avatar-actions input[type="file"]{
+  display: none;
+}
+
+/* Ẩn phần “Currently / Clear / Change” mặc định của Django */
+.emp-form-item input[name="avatar-clear"]{
+  display: none !important;
+}
+.emp-form-item a[href^="/media/"]{
+  /* nếu bạn muốn ẩn link default của Django trong trường hợp vẫn render ra */
+}
+

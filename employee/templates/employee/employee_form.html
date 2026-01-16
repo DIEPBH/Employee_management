@@ -1,0 +1,84 @@
+<form method="post" enctype="multipart/form-data" data-ajax="1" data-modal-type="employee">
+  {% csrf_token %}
+
+  <div class="emp-form-grid">
+    {% for field in form %}
+
+      {# ===== AVATAR: render riêng ===== #}
+      {% if field.name == "avatar" %}
+        <div class="emp-form-item emp-form-item--full">
+          <label class="emp-form-label" for="{{ field.id_for_label }}">
+            {{ field.label }}
+            {% if field.field.required %}<span class="text-danger">*</span>{% endif %}
+          </label>
+
+          <div class="avatar-box">
+            <div class="avatar-preview">
+              {% if form.instance.avatar %}
+                <img id="avatarPreviewImg" src="{{ form.instance.avatar.url }}" alt="Ảnh chân dung">
+                <div class="avatar-meta">
+                  <a class="avatar-file" href="{{ form.instance.avatar.url }}" target="_blank">
+                    {{ form.instance.avatar.name }}
+                  </a>
+                </div>
+              {% else %}
+                <div id="avatarPreviewEmpty" class="avatar-empty">Chưa có ảnh</div>
+                <img id="avatarPreviewImg" src="" alt="Ảnh chân dung" style="display:none;">
+              {% endif %}
+            </div>
+
+            <div class="avatar-actions">
+              <label class="btn btn-outline-primary btn-sm mb-0">
+                <i class="fa-solid fa-upload me-1"></i> Chọn ảnh
+                {{ field }}
+              </label>
+
+              {% if form.instance.avatar %}
+                <button type="button" class="btn btn-outline-danger btn-sm" id="btnAvatarClear">
+                  <i class="fa-solid fa-trash me-1"></i> Xóa ảnh
+                </button>
+              {% endif %}
+            </div>
+
+            {# field của Django sẽ chứa clear checkbox + file input, ta sẽ style/ẩn bằng CSS #}
+          </div>
+
+          {% for error in field.errors %}
+            <div class="emp-form-error">{{ error }}</div>
+          {% endfor %}
+        </div>
+
+      {# ===== CÁC FIELD CÒN LẠI: giữ y nguyên ===== #}
+      {% else %}
+        <div class="emp-form-item {% if field.name == 'Descriptions' or field.name == 'descriptions' %}emp-form-item--full{% endif %}">
+          <label class="emp-form-label" for="{{ field.id_for_label }}">
+            {{ field.label }}
+            {% if field.field.required %}<span class="text-danger">*</span>{% endif %}
+          </label>
+
+          {{ field }}
+
+          {% if field.help_text %}
+            <div class="emp-form-help">{{ field.help_text }}</div>
+          {% endif %}
+
+          {% for error in field.errors %}
+            <div class="emp-form-error">{{ error }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+    {% endfor %}
+  </div>
+
+  {% if form.non_field_errors %}
+    <div class="alert alert-danger mt-2">
+      {{ form.non_field_errors }}
+    </div>
+  {% endif %}
+
+  <div class="emp-form-actions">
+    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Đóng</button>
+    <button type="submit" class="btn btn-primary">Lưu</button>
+  </div>
+</form>

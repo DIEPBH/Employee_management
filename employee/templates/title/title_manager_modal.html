@@ -1,0 +1,32 @@
+<!-- title_manager_modal.html -->
+<div id="titleManagerRoot"
+     data-emp-lookup-url="{% url 'title:api_emp_lookup' %}"
+     data-title-table-url="{% url 'title:title_table' %}">
+
+  <div class="row g-2 align-items-end">
+    <div class="col-md-4">
+      <label class="form-label">Số hiệu</label>
+      <input id="empNumInput" class="form-control"
+             list="empNumList" placeholder="Nhập số hiệu">
+      <datalist id="empNumList"></datalist>
+    </div>
+
+    <div class="col-md-5">
+      <label class="form-label">Họ và tên</label>
+      <input id="fullNameInput" class="form-control" readonly>
+    </div>
+
+    <div class="col-md-3 text-end">
+      <button class="btn btn-success" id="btnAddTitle"
+              data-url="{% url 'title:add_title_modal' %}">
+        + Thêm chức danh
+      </button>
+    </div>
+  </div>
+
+  <hr>
+
+  <div id="titleTableWrap">
+    <div class="text-muted">Chọn Số hiệu để xem danh sách chức danh</div>
+  </div>
+</div>
