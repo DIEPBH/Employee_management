@@ -211,61 +211,79 @@ def index_emp_tile(request):
         return render(request, 'title/index_emp_title.html', {'titles': page_obj, 'page_obj': page_obj, 'paginator': paginator, 'querystring': querystring})
 
 # Thêm chức danh mới cho cán bộ
-#API modal thêm chức danh
+    #API modal thêm chức danh
 @login_required
 def title_manager_modal(request):
     html = render_to_string("title/title_manager_modal.html", {}, request=request)
     return JsonResponse({"success": True, "html": html})
 
+# employee/api.py
 @login_required
-def api_emp_lookup(request):
+def employee_lookup(request):
     q = (request.GET.get("q") or "").strip()
-    if not q:
-        return JsonResponse({"results": []})
 
-    qs = Emp_information.objects.filter(
-        Q(emp_num__icontains=q) | Q(full_name__icontains=q)
-    ).order_by("emp_num")[:15]
+    qs = Emp_information.objects.all()
+    if q:
+        qs = qs.filter(Q(emp_num__icontains=q) | Q(full_name__icontains=q))
 
-    return JsonResponse({
-        "results": [{"emp_num": e.emp_num, "full_name": e.full_name} for e in qs]
-    })
+    qs = qs.order_by("emp_num")[:20]
+    items = [{"code": e.emp_num, "name": e.full_name} for e in qs]
+    return JsonResponse({"success": True, "items": items})
 
+#submit form thêm chức danh cho cán bộ
 @login_required
-def api_title_list(request):
-    emp_num = (request.GET.get("emp_num") or "").strip()
+def emp_title_form(request):
+    emp_num = request.GET.get("emp_num") or request.POST.get("emp_num")
     if not emp_num:
-        return JsonResponse({"success": False, "html": ""})
-
-    emp = get_object_or_404(Emp_information, emp_num=emp_num)
-
-    titles = Emp_Title.objects.filter(emp_id=emp_num).select_related("emp_title").order_by("-decision_date")
-    html = render_to_string("title/title_table.html", {"titles": titles, "emp": emp}, request=request)
-
-    return JsonResponse({"success": True, "full_name": emp.full_name, "html": html})
-
-@login_required
-def add_employee_title_modal(request):
+        return JsonResponse({"success": False, "html": "<div class='alert alert-danger'>Thiếu mã cán bộ</div>"})
+    try:
+        emp  = Emp_information.objects.get(emp_num=emp_num)
+    except Emp_information.DoesNotExist:
+        return JsonResponse({"success": False, "html": "<div class='alert alert-danger'>Cán bộ không tồn tại</div>"})
+    
     if request.method == "POST":
-        form = EmpTitleForm(request.POST, request.FILES, )
+        form = EmpTitleForm(request.POST, request.FILES)
+        form.instance.emp = emp
         if form.is_valid():
-            new_title = form.save(commit=False)
-            new_title.created_by = request.user
-            new_title.created_at = datetime.now()
-            new_title.save()
+            obj = form.save(commit=False)
+            obj.created_by = request.user
+            obj.created_at = datetime.now()
+            obj.emp = emp
+            obj.save()
             return JsonResponse({"success": True})
 
-        html = render_to_string(
-            "title/title_form.html",
-            {"form": form},
-            request=request
-        ) 
-        return JsonResponse({"success": False, "html": html})
-    # GET
-    form = EmpTitleForm()
-    html = render_to_string(
-        "title/title_form.html",
-        {"form": form},
-        request=request
-    )
+        html = render_to_string("title/title_form.html", {"form": form, "emp_num": emp_num}, request=request)
+        return JsonResponse({"success": False, "html": html, "errors": form.errors})
+
+    form = EmpTitleForm(initial={"emp_num": emp_num})
+    html = render_to_string("title/title_form.html", {"form": form, "emp_num": emp_num}, request=request)
     return JsonResponse({"success": True, "html": html})
+
+# API bảng chức danh của cán bộ
+
+@login_required
+def employee_titles_table(request, emp_num):
+    qs = (
+    Emp_Title.objects
+    .select_related("emp_title")
+    .filter(emp=emp_num)
+    .order_by("-decision_date")
+    )
+
+    paginator = Paginator(qs, 10) # <-- đổi 10 dòng/trang 
+    raw_page = request.GET.get("page", "1")
+    try:
+        page_number = int(raw_page)
+    except (TypeError, ValueError):
+        page_number = 1
+
+
+    if page_number < 1:
+        page_number = 1
+
+    page_obj = paginator.get_page(page_number)
+
+    html = render_to_string("title/title_table.html",{"page_obj": page_obj, "emp_num": emp_num},request=request,)
+    return JsonResponse({"success": True, "html": html})
+
+# Sửa chức danh của cán bộ

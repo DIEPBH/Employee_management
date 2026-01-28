@@ -1,0 +1,137 @@
+/* ===== Sub Table Wrapper ===== */
+.sub-table {
+  background: #fff;
+  border: 1px solid #e3e8ef;
+  border-radius: 14px;
+  padding: 12px;
+}
+
+/* meta */
+.sub-table__meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: #64748b;
+  margin-bottom: 8px;
+}
+
+/* table wrap */
+.sub-table__wrap {
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  overflow: auto;
+  max-height: 420px;
+}
+
+/* header */
+.sub-table thead th {
+  background: #f8fafc;
+  font-weight: 600;
+  font-size: 13px;
+  white-space: nowrap;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+/* columns */
+.st-id { width: 70px; text-align: center; }
+.st-date { width: 120px; white-space: nowrap; text-align: center; }
+.st-right { text-align: right; width: 110px; }
+.st-center { text-align: center; width: 120px; }
+.st-actions { text-align: right; width: 200px; white-space: nowrap; }
+
+/* title cell */
+.st-title {
+  font-weight: 600;
+  color: #0f172a;
+}
+.st-sub {
+  font-size: 12px;
+  color: #64748b;
+  max-width: 420px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* decision code */
+.st-code-pill {
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 999px;
+  padding: 2px 8px;
+  font-size: 12px;
+}
+
+/* badge */
+.st-badge {
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+}
+.st-badge--on {
+  color: #15803d;
+  background: #dcfce7;
+  border-color: #86efac;
+}
+.st-badge--off {
+  color: #475569;
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+/* empty */
+.st-empty {
+  padding: 32px 12px;
+  text-align: center;
+  color: #64748b;
+}
+
+/* pagination */
+.sub-table__pager {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+}
+.st-range {
+  font-size: 13px;
+  color: #64748b;
+}
+
+/* hover row */
+.sub-table tbody tr:hover {
+  background: #f8fafc;
+}
+/* ===== Center header text ===== */
+.sub-table thead th {
+  text-align: center;
+  vertical-align: middle;
+}
+
+/* ===== Center body cells (default) ===== */
+.sub-table tbody td {
+  vertical-align: middle;
+}
+
+/* Center các cột ngắn */
+.sub-table tbody td.st-id,
+.sub-table tbody td.st-date,
+.sub-table tbody td.st-center,
+.sub-table tbody td.st-actions {
+  text-align: center;
+}
+
+/* Cột số thì căn giữa */
+.sub-table tbody td.st-right {
+  text-align: center;
+}
+.sub-table thead th.st-date {
+text-align: center;
+}
+/* Center body for date columns */
+.sub-table tbody td.st-date {
+text-align: center;
+}

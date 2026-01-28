@@ -35,7 +35,7 @@ class EmpInformationForm(forms.ModelForm):
 class EmpTitleForm(forms.ModelForm):
     class Meta:
         model = Emp_Title
-        fields = ['emp','emp_title','allowances','date_of_receipt','form_of_appointment','decision_number','decision_date','stop_decision_date','file']
+        fields = ['emp_title','allowances','date_of_receipt','form_of_appointment','decision_number','decision_date','stop_decision_date','file']
         widgets = {
             'emp_num': forms.TextInput(attrs={'readonly': 'readonly'}),
             'full_name': forms.TextInput(attrs={'readonly': 'readonly'}),

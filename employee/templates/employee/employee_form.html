@@ -1,4 +1,4 @@
-<form method="post" enctype="multipart/form-data" data-ajax="1" data-modal-type="employee">
+<form method="post" enctype="multipart/form-data" action="{% url 'employee:add_employee_modal' %}" data-ajax="1" data-modal-type="employee">
   {% csrf_token %}
 
   <div class="emp-form-grid">

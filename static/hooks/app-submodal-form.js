@@ -1,13 +1,13 @@
-// static/js/hooks/app-modal-form.js
+// static/js/hooks/app-submodal-form.js
 document.addEventListener("submit", async (e) => {
-  const form = e.target.closest("#appModal form[data-ajax='1']");
+  const form = e.target.closest("#appSubModal form[data-ajax='1']");
   if (!form) return;
 
   e.preventDefault();
-  
+
   const url  = form.action || location.href;
   const type = form.dataset.modalType || "";
-  const body = document.getElementById("appModalBody");
+  const body = document.getElementById("appSubModalBody");
   const formData = new FormData(form);
 
   try {
@@ -22,12 +22,18 @@ document.addEventListener("submit", async (e) => {
     const data = await res.json();
     
     if (data.success) {
+      // gọi hook thành công
       window.ModalHooks?.[type]?.onSuccess?.(data);
-      AppModal.close();
+
+      // đóng sub modal
+      bootstrap.Modal
+        .getInstance(document.getElementById("appSubModal"))
+        ?.hide();
+
       return;
     }
 
-    // submit lỗi → render lại form vào MODAL CHA
+    // submit lỗi → render lại form vào SUB MODAL
     if (data.html) {
       body.innerHTML = data.html;
       window.ModalHooks?.[type]?.onLoaded?.(body);
@@ -38,6 +44,6 @@ document.addEventListener("submit", async (e) => {
 
   } catch (err) {
     body.innerHTML = "<div class='alert alert-danger'>Lỗi submit</div>";
-    console.error("Modal submit error:", err);
+    console.error("Submodal submit error:", err);
   }
 });

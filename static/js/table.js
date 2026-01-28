@@ -1,4 +1,5 @@
 // table.js
+
 App.onReady(() => {
   // TOOLTIP
   if (window.bootstrap) {

@@ -8,6 +8,7 @@
 
   let instance = null;
   let currentType = null;
+  let suspendReset = false;
 
   function getInstance() {
     if (!instance) {
@@ -59,11 +60,16 @@
     getInstance().hide();
   }
 
+  function suspendCleanup(v = true) {
+    suspendReset = v;
+  }
+
   modalEl.addEventListener("hidden.bs.modal", () => {
+    if (suspendReset) return;
     bodyEl.innerHTML = "<div class='p-3'>Đang tải...</div>";
     titleEl.textContent = "";
     currentType = null;
   });
 
-  window.AppModal = { open, close };
+  window.AppModal = { open, close, suspendCleanup };
 })();

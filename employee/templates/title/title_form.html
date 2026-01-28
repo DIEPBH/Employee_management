@@ -1,60 +1,23 @@
-<form method="post" enctype="multipart/form-data" id="title-form">
+<form method="post" enctype="multipart/form-data" action="{% url 'employee:emp_title_form'%}" data-ajax="1" data-modal-type="emp_title_form">
   {% csrf_token %}
   <input type="hidden" name="emp_num" value="{{ emp_num }}">
+  <div class="emp-form-grid">
+    {% for field in form %}
+      <div class="emp-form-item {% if field.name == 'file' or field.name == 'File' %}emp-form-item--full{% endif %}">
+        <label class="emp-form-label" for="{{ field.id_for_label }}">
+          {{ field.label }}
+          {% if field.field.required %}<span class="text-danger">*</span>{% endif %}
+        </label>
 
-  <div class="row g-3">
-    <div class="col-md-6">
-      <label class="form-label">Chức danh</label>
-      {{ form.emp_title }}
-      {% for e in form.emp_title.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
-    </div>
+        {{ field }}
 
-    <div class="col-md-6">
-      <label class="form-label">Phụ cấp</label>
-      {{ form.allowances }}
-      {% for e in form.allowances.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
-    </div>
-
-    <div class="col-md-6">
-      <label class="form-label">Ngày nhận chức danh</label>
-      {{ form.date_of_receipt }}
-      {% for e in form.date_of_receipt.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
-    </div>
-
-    <div class="col-md-6">
-      <label class="form-label">Hình thức bổ nhiệm</label>
-      {{ form.form_of_appointment }}
-      {% for e in form.form_of_appointment.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
-    </div>
-
-    <div class="col-md-6">
-      <label class="form-label">Số quyết định</label>
-      {{ form.decision_number }}
-      {% for e in form.decision_number.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
-    </div>
-
-    <div class="col-md-6">
-      <label class="form-label">Ngày quyết định</label>
-      {{ form.decision_date }}
-      {% for e in form.decision_date.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
-    </div>
-
-    <div class="col-md-6">
-      <label class="form-label">Ngày dừng quyết định</label>
-      {{ form.stop_decision_date }}
-      {% for e in form.stop_decision_date.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
-    </div>
-
-    <div class="col-md-6">
-      <label class="form-label">File đính kèm</label>
-      {{ form.file }}
-      {% for e in form.file.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
-    </div>
+        {% for error in field.errors %}
+          <div class="emp-form-error">{{ error }}</div>
+        {% endfor %}
+      </div>
+    {% endfor %}
   </div>
-
-  {% if form.non_field_errors %}
-    <div class="alert alert-danger mt-3">{{ form.non_field_errors }}</div>
-  {% endif %}
+  
 
   <div class="d-flex justify-content-end gap-2 mt-3">
     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Đóng</button>

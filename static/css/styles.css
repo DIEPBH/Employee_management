@@ -11789,3 +11789,65 @@ body {
   /* nếu bạn muốn ẩn link default của Django trong trường hợp vẫn render ra */
 }
 
+/* =================== DATALIST =================== */
+.emp-lookup { position: relative; }
+
+/* hộp gợi ý */
+.emp-suggest{
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 1055;               /* nổi trên modal */
+  background: #fff;
+  border: 1px solid #e3e8ef;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.10);
+  overflow: hidden;
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+/* item */
+.emp-suggest .item{
+  padding: 10px 12px;
+  cursor: pointer;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  transition: background .12s ease;
+}
+
+.emp-suggest .item:hover,
+.emp-suggest .item.active{
+  background: rgba(59,130,246,.10);
+}
+
+/* code pill */
+.emp-suggest .code{
+  font-weight: 700;
+  font-size: 13px;
+  color: #1f2a37;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  padding: 4px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+/* name */
+.emp-suggest .name{
+  color: #334155;
+  font-size: 14px;
+  line-height: 1.25;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* trạng thái rỗng */
+.emp-suggest .empty{
+  padding: 12px;
+  color: #64748b;
+  font-size: 14px;
+}

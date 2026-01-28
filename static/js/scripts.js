@@ -143,15 +143,25 @@ function syncActionTableRows() {
   document.addEventListener('mouseup', () => {
     setTimeout(syncActionTableRows, 0);
   });
+  
   document.addEventListener("DOMContentLoaded", () => {
   document.addEventListener("click", (e) => {
     const btn = e.target.closest(".js-open-modal");
     if (!btn) return;
 
-    const url = btn.dataset.url;
-    const title = btn.dataset.title || "";
-    const type = btn.dataset.type || "";
+    e.preventDefault();
 
-    window.openAppModal(url, { title, type, reloadOnSuccess: true });
+    const url = btn.dataset.modalUrl;
+    const title = btn.dataset.modalTitle || "";
+    const type = btn.dataset.modalType || "";
+
+    AppModal.open(url, { title, type });
   });
 });
+
+window.App = window.App || {};
+App.onReady = function (fn) {
+  document.addEventListener("DOMContentLoaded", fn);
+};
+
+

@@ -103,7 +103,7 @@ class Emp_information(models.Model):
 
     #Xóa avatar khi xóa nhân viên
     @receiver(post_delete, sender='employee.Emp_information')
-    def delete_avatar(self, *args, instance, **kwargs):
+    def delete_avatar(sender, *args, instance, **kwargs):
         if instance.avatar and os.path.isfile(instance.avatar.path):
             os.remove(instance.avatar.path)
     #Xóa avatar khi thay đổi ảnh mới
@@ -129,15 +129,15 @@ class Emp_information(models.Model):
 #2 bảng chức danh và chức vụ của nhân viên
 class Emp_Title(models.Model):
     id = models.AutoField(primary_key=True)
-    emp = models.ForeignKey(Emp_information,to_field='emp_num',db_column='emp_num', on_delete=models.CASCADE, verbose_name="Nhân viên", default='')
-    emp_title = models.ForeignKey(position, on_delete=models.CASCADE, verbose_name="Chức danh", default='')
+    emp = models.ForeignKey(Emp_information,to_field='emp_num',db_column='emp_num', on_delete=models.CASCADE, verbose_name="Nhân viên")
+    emp_title = models.ForeignKey(position, on_delete=models.CASCADE, verbose_name="Chức danh")
     allowances = models.DecimalField("Phụ cấp", max_digits=10, decimal_places=2, null=False)
     date_of_receipt = models.DateField("Ngày nhận chức danh",null=False)
     form_of_appointment = models.CharField("Hình thức bổ nhiệm",max_length=100, null=False)
     decision_number = models.CharField("Số quyết định",max_length=100, null=False)
     decision_date = models.DateField("Ngày quyết định",null=False)
-    stop_decision_date = models.DateField("Ngày dừng quyết định",null=True)
-    is_active = models.BooleanField("Hiệu lực", default='')
+    stop_decision_date = models.DateField("Ngày dừng quyết định",null=True,blank=True)
+    is_active = models.CharField("Hiệu lực", max_length=1, null=True)
     file = models.FileField("File đính kèm",upload_to='employee_titles/', null=True, blank=True)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, verbose_name="Người tạo")
     created_at = models.DateTimeField("Ngày tạo", auto_now_add=True)
