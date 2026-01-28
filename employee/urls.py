@@ -18,9 +18,9 @@ urlpatterns = [
     path('api/employee/', views.employee_lookup, name='employee_lookup'),
     path("api/employee/<str:emp_num>/titles/", views.employee_titles_table, name="employee_titles_table"),
     path("titles/add/", views.emp_title_form, name="emp_title_form"),
-    #path("titles/<int:pk>/edit/", views.emp_title_edit_modal, name="emp_title_edit_modal"),
-    #path("titles/<int:pk>/view/", views.emp_title_view_modal, name="emp_title_view_modal"),
+    path("titles/<int:id>/edit/", views.emp_title_edit_modal, name="emp_title_edit_modal"),
+    path("titles/<int:id>/view/", views.emp_title_view_modal, name="emp_title_view_modal"),
     # 5) (tuỳ chọn) xóa
-    #path("titles/<int:pk>/delete/", views.emp_title_delete, name="emp_title_delete"),
+    path("titles/<int:id>/delete/", views.emp_title_delete, name="emp_title_delete"),
 
 ]

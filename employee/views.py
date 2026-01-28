@@ -14,6 +14,7 @@ from django.utils.http import urlencode
 from urllib.parse import urlencode
 from django.template.loader import render_to_string
 from django.contrib.auth.decorators import login_required
+from django.urls import reverse
 # Create your views here.
 
 ###########################################
@@ -100,7 +101,8 @@ def add_employee_modal(request):
 
         html = render_to_string(
             "employee/employee_form.html",
-            {"form": form},
+            {"form": form,
+             "post_url": reverse("employee:add_employee_modal"), "mode": "add"},
             request=request
         ) 
         return JsonResponse({"success": False, "html": html})
@@ -108,7 +110,8 @@ def add_employee_modal(request):
     form = EmpInformationForm()
     html = render_to_string(
         "employee/employee_form.html",
-        {"form": form},
+        {"form": form,
+         "post_url": reverse("employee:add_employee_modal"), "mode": "add"},
         request=request
     )
     return JsonResponse({"success": True, "html": html})
@@ -138,7 +141,8 @@ def edit_employee_modal(request, emp_id):
 
         html = render_to_string(
             "employee/employee_form.html",
-            {"form": form},
+            {"form": form,
+             "post_url": reverse("employee:edit_employee_modal", args=[employee.id])},
             request=request
         ) 
         return JsonResponse({"success": False, "html": html})
@@ -146,7 +150,8 @@ def edit_employee_modal(request, emp_id):
     form = EmpInformationForm(instance=employee)
     html = render_to_string(
         "employee/employee_form.html",
-        {"form": form},
+        {"form": form,
+         "post_url": reverse("employee:edit_employee_modal", args=[employee.id])},
         request=request
     )
     return JsonResponse({"success": True, "html": html})
@@ -252,11 +257,14 @@ def emp_title_form(request):
             obj.save()
             return JsonResponse({"success": True})
 
-        html = render_to_string("title/title_form.html", {"form": form, "emp_num": emp_num}, request=request)
+        html = render_to_string("title/title_form.html", {"form": form, 
+                                                          "emp_num": emp_num, 
+                                                          "post_url": reverse("employee:emp_title_form"), "mode": "add"}, request=request)
         return JsonResponse({"success": False, "html": html, "errors": form.errors})
 
     form = EmpTitleForm(initial={"emp_num": emp_num})
-    html = render_to_string("title/title_form.html", {"form": form, "emp_num": emp_num}, request=request)
+    html = render_to_string("title/title_form.html", {"form": form, "emp_num": emp_num,
+                                                       "post_url": reverse("employee:emp_title_form"), "mode": "add"}, request=request)
     return JsonResponse({"success": True, "html": html})
 
 # API bảng chức danh của cán bộ
@@ -287,3 +295,58 @@ def employee_titles_table(request, emp_num):
     return JsonResponse({"success": True, "html": html})
 
 # Sửa chức danh của cán bộ
+@login_required
+def emp_title_edit_modal(request, id):
+    title = get_object_or_404(Emp_Title, id=id)
+    if request.method == "POST":
+        form = EmpTitleForm(request.POST, request.FILES, instance=title)
+        if form.is_valid():
+            form.save()
+            return JsonResponse({"success": True})
+
+        html = render_to_string(
+            "title/title_form.html",
+            {"form": form,
+             "post_url": reverse("employee:emp_title_edit_modal", args=[title.id])},
+            request=request
+        ) 
+        return JsonResponse({"success": False, "html": html})
+    # GET
+    form = EmpTitleForm(instance=title)
+    html = render_to_string(
+        "title/title_form.html",
+        {"form": form,
+         "post_url": reverse("employee:emp_title_edit_modal", args=[title.id])},
+        request=request
+    )
+    return JsonResponse({"success": True, "html": html})
+
+#Xem chức danh của cán bộ:
+@login_required
+def emp_title_view_modal(request, id):
+    title = get_object_or_404(Emp_Title, id=id)
+
+
+    form = EmpTitleForm(instance=title)
+    for field in form.fields.values():
+        field.disabled = True
+    html = render_to_string(
+    "title/title_form.html",
+    {
+    "form": form,
+    "mode": "view", # 👈 rất quan trọng
+    },
+    request=request
+    )
+    return JsonResponse({"success": True, "html": html})
+
+# Xóa bản ghi chức danh:
+@login_required
+def emp_title_delete(request, id):
+    if request.method != "POST":
+        return JsonResponse({"success": False, "message": "Method not allowed"}, status=405)
+
+    title = get_object_or_404(Emp_Title, id=id)
+    title.delete()
+    messages.success(request, 'Bản ghi đã được xóa thành công.')
+    return JsonResponse({"success": True})

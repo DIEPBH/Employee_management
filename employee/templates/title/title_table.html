@@ -63,17 +63,24 @@
 
           <td class="st-actions">
             <button class="btn btn-outline-info btn-sm"
-              data-open-child data-url="#" data-title="Xem chức vụ" data-type="emp_title_form">
+              data-open-child data-url="{% url 'employee:emp_title_view_modal' r.id %}" 
+              data-title="Xem chức vụ" 
+              data-type="emp_title_form">
               Xem
             </button>
             <button class="btn btn-outline-primary btn-sm"
-              data-open-child data-url="#" data-title="Sửa chức vụ" data-type="emp_title_form">
+              data-open-child 
+              data-url="{% url 'employee:emp_title_edit_modal' r.id %}" 
+              data-title="Sửa chức vụ" 
+              data-type="emp_title_form">
               Sửa
             </button>
-            <button class="btn btn-outline-danger btn-sm"
-              data-delete-title data-url="#">
+            
+            <button class="btn btn-outline-danger btn-sm js-delete-title"
+              data-delete-title data-url="{% url 'employee:emp_title_delete' r.id %}">
               Xóa
             </button>
+
           </td>
         </tr>
         {% empty %}

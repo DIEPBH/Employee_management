@@ -1,26 +1,77 @@
-<form method="post" enctype="multipart/form-data" action="{% url 'employee:emp_title_form'%}" data-ajax="1" data-modal-type="emp_title_form">
-  {% csrf_token %}
-  <input type="hidden" name="emp_num" value="{{ emp_num }}">
-  <div class="emp-form-grid">
+{# ================= FORM OPEN ================= #}
+{% if mode == "view" %}
+  <form>
+{% else %}
+  <form method="post"
+        enctype="multipart/form-data"
+        action="{{ post_url|default:request.path }}"
+        data-ajax="1"
+        data-modal-type="emp_title_form">
+    {% csrf_token %}
+  {% endif %}
+
+  {# ================= ERROR BLOCK ================= #}
+  {% if form.errors and mode != "view" %}
+    <div class="form-alert form-alert--error">
+      <div class="form-alert__title">
+        ⚠️ Không thể lưu chức danh
+      </div>
+      <ul class="form-alert__list">
+        {% for err in form.non_field_errors %}
+          <li>{{ err }}</li>
+        {% endfor %}
+        {% for field in form %}
+          {% for err in field.errors %}
+            <li><strong>{{ field.label }}:</strong> {{ err }}</li>
+          {% endfor %}
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
+  {# ================= EMP NUM (chỉ dùng cho THÊM) ================= #}
+  {% if emp_num %}
+    <input type="hidden" name="emp_num" value="{{ emp_num }}">
+  {% endif %}
+
+  {# ================= FORM BODY ================= #}
+  <div class="emp-form-grid {% if mode == 'view' %}form-view{% endif %}">
     {% for field in form %}
-      <div class="emp-form-item {% if field.name == 'file' or field.name == 'File' %}emp-form-item--full{% endif %}">
+      <div class="emp-form-item
+           {% if field.name == 'file' or field.name == 'File' %}
+              emp-form-item-file emp-form-item--full
+           {% endif %}">
         <label class="emp-form-label" for="{{ field.id_for_label }}">
           {{ field.label }}
-          {% if field.field.required %}<span class="text-danger">*</span>{% endif %}
+          {% if field.field.required and mode != "view" %}
+            <span class="text-danger">*</span>
+          {% endif %}
         </label>
 
         {{ field }}
 
-        {% for error in field.errors %}
-          <div class="emp-form-error">{{ error }}</div>
-        {% endfor %}
+        {% if mode != "view" %}
+          {% for error in field.errors %}
+            <div class="emp-form-error">{{ error }}</div>
+          {% endfor %}
+        {% endif %}
       </div>
     {% endfor %}
   </div>
-  
 
+  {# ================= FOOTER ================= #}
   <div class="d-flex justify-content-end gap-2 mt-3">
-    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Đóng</button>
-    <button type="submit" class="btn btn-primary">Lưu</button>
+    <button type="button"
+            class="btn btn-outline-secondary"
+            data-bs-dismiss="modal">
+      Đóng
+    </button>
+
+    {% if mode != "view" %}
+      <button type="submit" class="btn btn-primary">
+        💾 Lưu
+      </button>
+    {% endif %}
   </div>
+
 </form>

@@ -11851,3 +11851,129 @@ body {
   color: #64748b;
   font-size: 14px;
 }
+
+/* =================== ERROR =================== */
+.form-alert {
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-bottom: 16px;
+  font-size: 14px;
+}
+
+.form-alert--error {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+}
+
+.form-alert__title {
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.form-alert__list {
+  padding-left: 18px;
+  margin: 0;
+}
+
+.form-alert__list li {
+  margin: 4px 0;
+}
+
+/* =================== CSS File Field =================== */
+/* ===== FILE FIELD (enhanced) ===== */
+.emp-form-item-file {
+  grid-column: 1 / -1; /* nếu bạn muốn file nằm full hàng */
+}
+
+/* Ẩn HTML gốc Django của ClearableFileInput */
+.emp-form-item-file.is-enhanced > p,
+.emp-form-item-file.is-enhanced > br {
+  display: none !important;
+}
+
+/* UI mới */
+.emp-form-item-file .ff-ui{
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Row: currently + clear */
+.emp-form-item-file .ff-row{
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Current file block */
+.emp-form-item-file .ff-current{
+  flex: 1;
+  min-width: 0;
+}
+
+.emp-form-item-file .ff-current a{
+  display: block;
+  padding: 10px 12px;
+  border: 1px solid #cfd4da;
+  border-radius: 10px;
+  background: #f8f9fa;
+  text-decoration: none;
+  font-size: 14px;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.emp-form-item-file .ff-empty{
+  padding: 10px 12px;
+  border: 1px dashed #cfd4da;
+  border-radius: 10px;
+  background: #fff;
+  color: #6c757d;
+  font-size: 14px;
+}
+
+/* Clear button (checkbox + text cùng hàng) */
+.emp-form-item-file .ff-clear{
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px dashed #f1c0c0;
+  border-radius: 10px;
+  background: #fff5f5;
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+
+/* IMPORTANT: phá rule height:40px của .emp-form-item input */
+.emp-form-item-file .ff-clear input[type="checkbox"]{
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: #dc3545;
+}
+
+/* Change row */
+.emp-form-item-file .ff-change{
+  padding: 10px 12px;
+  border: 1px solid #cfd4da;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.emp-form-item-file .ff-cap{
+  font-size: 13px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+/* input file: không set height 40 */
+.emp-form-item-file .ff-change input[type="file"]{
+  height: auto !important;
+  padding: 8px;
+}

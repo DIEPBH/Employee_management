@@ -102,6 +102,6 @@ ModalHooks["employee"] = {
   onSuccess() {
     // Tùy bạn: reload table / gọi lại API / toast
     // Ví dụ đơn giản:
-    // window.location.reload();
+     window.location.reload();
   }
 };

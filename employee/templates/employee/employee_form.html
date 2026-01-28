@@ -1,5 +1,14 @@
-<form method="post" enctype="multipart/form-data" action="{% url 'employee:add_employee_modal' %}" data-ajax="1" data-modal-type="employee">
-  {% csrf_token %}
+{% if mode == "view" %}
+  <form>
+  {% else %}
+  <form method="post"
+        enctype="multipart/form-data"
+        action="{{ post_url|default:request.path }}"
+        data-ajax="1"
+        data-modal-type="employee">
+    {% csrf_token %}
+  {% endif %}
+
 
   <div class="emp-form-grid">
     {% for field in form %}
