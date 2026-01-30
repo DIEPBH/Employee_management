@@ -139,9 +139,10 @@ class Emp_Title(models.Model):
     stop_decision_date = models.DateField("Ngày dừng quyết định",null=True,blank=True)
     is_active = models.CharField("Hiệu lực", max_length=1, null=True)
     file = models.FileField("File đính kèm",upload_to='employee_titles/', null=True, blank=True)
-    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, verbose_name="Người tạo")
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, verbose_name="Người tạo", related_name="emp_titles_created",)
     created_at = models.DateTimeField("Ngày tạo", auto_now_add=True)
-
+    update_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, verbose_name="Người sửa", related_name="emp_titles_updated",)
+    update_at = models.DateTimeField("Ngày sửa", auto_now_add=False,null=True)
     # kiểm soát không overlap chức danh cho cùng 1 nhân viên
     def clean(self):
         super().clean()
@@ -164,8 +165,27 @@ class Emp_Title(models.Model):
             qs = qs.filter(Q(stop_decision_date__isnull=True) | Q(stop_decision_date__gte=start))
         if qs.exists():
             raise ValidationError("Khoảng thời gian chức danh bị chồng lấn với bản ghi khác.")
-        def __str__(self):
-            return self.emp_title
+    def __str__(self):
+        return self.emp_title
+        
+    #Xóa file khi xóa bản ghi chức vụ
+    @receiver(post_delete, sender='employee.Emp_Title')
+    def delete_file(sender, *args, instance, **kwargs):
+        if instance.file and os.path.isfile(instance.file.path):
+            os.remove(instance.file.path)
+    #Xóa file khi thay đổi file mới
+    @receiver(pre_save, sender='employee.Emp_Title')
+    def pre_save_file(sender, instance, **kwargs):
+        if not instance.pk:
+            return False
+        try:
+            old_file = Emp_Title.objects.get(pk=instance.pk).file
+        except Emp_Title.DoesNotExist:
+            return False
+        new_file = instance.file
+        if not old_file == new_file:
+            if old_file and os.path.isfile(old_file.path):
+                os.remove(old_file.path)
 
 #3 Bảng thông tin quy hoạch chức vụ của nhân viên
 class Emp_Position(models.Model):
@@ -174,8 +194,59 @@ class Emp_Position(models.Model):
     position = models.ForeignKey(position, on_delete=models.CASCADE, verbose_name="Chức vụ", default='')
     date_position = models.DateField("Ngày quy hoạch",null=False)
     votes = models.CharField("Số phiếu bầu",max_length=100, null=False)
-    date_stop_position = models.DateField("Ngày dừng quy hoạch",null=False)
+    date_stop_position = models.DateField("Ngày dừng quy hoạch",null=True, blank=True)
     reason_stop_position = models.CharField("Lý do dừng quy hoạch",max_length=100, null=False)
+    is_active = models.CharField("Hiệu lực", max_length=1, null=True)
+    file = models.FileField("File đính kèm",upload_to='employee_Position/', null=True, blank=True)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, verbose_name="Người tạo", related_name="emp_Position_created",)
+    created_at = models.DateTimeField("Ngày tạo", auto_now_add=True)
+    update_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, verbose_name="Người sửa", related_name="emp_Position_updated",)
+    update_at = models.DateTimeField("Ngày sửa", auto_now_add=False,null=True)
+
+    # kiểm soát không overlap chức danh cho cùng 1 nhân viên
+    def clean(self):
+        super().clean()
+        start = self.date_position
+        end = self.date_stop_position
+
+        if end and end < start:
+            raise ValidationError("Ngày dừng quyết định >= ngày quyết định")
+        qs = Emp_Position.objects.filter(emp=self.emp).exclude(id=self.id)
+
+    # Overlap condition:
+    # [start, end] giao nhau với [a, b]
+    # end null => b = +inf
+        if end:
+            qs = qs.filter(
+                Q(date_stop_position__isnull=True, date_position__lte=end) |
+                Q(date_stop_position__isnull=False, date_position__lte=end, date_stop_position__gte=start)
+            )
+        else:
+            qs = qs.filter(Q(date_stop_position__isnull=True) | Q(date_stop_position__gte=start))
+        if qs.exists():
+            raise ValidationError("Khoảng thời gian chức danh bị chồng lấn với bản ghi khác.")
+        
+    def __str__(self):
+        return self.position
+        
+    #Xóa file khi xóa bản ghi chức vụ
+    @receiver(post_delete, sender='employee.Emp_Title')
+    def delete_file(sender, *args, instance, **kwargs):
+        if instance.file and os.path.isfile(instance.file.path):
+            os.remove(instance.file.path)
+    #Xóa file khi thay đổi file mới
+    @receiver(pre_save, sender='employee.Emp_Title')
+    def pre_save_file(sender, instance, **kwargs):
+        if not instance.pk:
+            return False
+        try:
+            old_file = Emp_Title.objects.get(pk=instance.pk).file
+        except Emp_Title.DoesNotExist:
+            return False
+        new_file = instance.file
+        if not old_file == new_file:
+            if old_file and os.path.isfile(old_file.path):
+                os.remove(old_file.path)
 
     def __str__(self):
         return self.position.name

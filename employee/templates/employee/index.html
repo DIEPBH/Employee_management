@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block content %}
     <div class="container-fluid page-header">
         <i class="fa-solid fa-users me-2"></i>
@@ -266,4 +267,7 @@
             </div>
     </div>
 
+{% endblock %}
+{% block script %}
+<script src="{% static 'hooks/employee-modal.js' %}"></script>
 {% endblock %}

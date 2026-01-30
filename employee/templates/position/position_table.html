@@ -16,13 +16,10 @@
       <thead>
         <tr>
           <th class="st-id">ID</th>
-          <th>Chức danh</th>
-          <th class="st-right">Phụ cấp</th>
-          <th class="st-date">Ngày nhận QĐ</th>
-          <th>Hình thức bổ nhiệm</th>
-          <th class="st-code">Số QĐ</th>
-          <th class="st-date">Ngày QĐ</th>
-          <th class="st-date">Ngày dừng QĐ</th>
+          <th>Chức vụ</th>
+          <th class="st-date">Ngày quy hoạch</th>
+          <th class="st-right">Số phiếu bầu</th>
+          <th class="st-date">Ngày dừng quy hoạch</th>
           <th class="st-center">Hiệu lực</th>
           <th class="st-actions">Thao tác</th>
         </tr>
@@ -34,24 +31,17 @@
           <td class="st-id text-muted">{{ r.id }}</td>
 
           <td>
-            <div class="st-title">{{ r.emp_title }}</div>
+            <div class="st-title">{{ r.position }}</div>
           </td>
 
-          <td class="st-right">
-            {% if r.allowances %}{{ r.allowances }}{% else %}<span class="text-muted">—</span>{% endif %}
-          </td>
-
-          <td class="st-date">{% if r.date_of_receipt %}{{ r.date_of_receipt|date:"d/m/Y" }}{% else %}—{% endif %}</td>
-          <td>{% if r.form_of_appointment %}{{ r.form_of_appointment }}{% else %}—{% endif %}</td>
+          <td class="st-date">{% if r.date_position %}{{ r.date_position|date:"d/m/Y" }}{% else %}—{% endif %}</td>
 
           <td>
-            {% if r.decision_number %}
-              <code class="st-code-pill">{{ r.decision_number }}</code>
+            {% if r.votes %}
+              <code class="st-code-pill">{{ r.votes }}</code>
             {% else %}—{% endif %}
           </td>
-
-          <td class="st-date">{% if r.decision_date %}{{ r.decision_date|date:"d/m/Y" }}{% else %}—{% endif %}</td>
-          <td class="st-date">{% if r.stop_decision_date %}{{ r.stop_decision_date|date:"d/m/Y" }}{% else %}—{% endif %}</td>
+          <td class="st-date">{% if r.date_stop_position %}{{ r.date_stop_position|date:"d/m/Y" }}{% else %}—{% endif %}</td>
 
           <td class="st-center">
             {% if r.is_active == 'Y' %}
@@ -63,21 +53,21 @@
 
           <td class="st-actions">
             <button class="btn btn-outline-info btn-sm"
-              data-open-child data-url="{% url 'employee:emp_title_view_modal' r.id %}" 
+              data-open-child data-url="#" 
               data-title="Xem chức vụ" 
               data-type="emp_title_form">
               Xem
             </button>
             <button class="btn btn-outline-primary btn-sm"
               data-open-child 
-              data-url="{% url 'employee:emp_title_edit_modal' r.id %}" 
+              data-url="#" 
               data-title="Sửa chức vụ" 
               data-type="emp_title_form">
               Sửa
             </button>
             
-            <button class="btn btn-outline-danger btn-sm js-delete-title"
-              data-delete-title data-url="{% url 'employee:emp_title_delete' r.id %}">
+            <button class="btn btn-outline-danger btn-sm js-delete-position"
+              data-delete-title data-url="#">
               Xóa
             </button>
 
@@ -103,7 +93,7 @@
 
     <ul class="pagination pagination-sm mb-0">
       <li class="page-item {% if not page_obj.has_previous %}disabled{% endif %}">
-        <a class="page-link js-title-page" href="#"
+        <a class="page-link js-position-page" href="#"
            data-page="{% if page_obj.has_previous %}{{ page_obj.previous_page_number }}{% else %}1{% endif %}">‹</a>
       </li>
 
@@ -112,13 +102,13 @@
           <li class="page-item active"><span class="page-link">{{ n }}</span></li>
         {% elif n >= page_obj.number|add:"-2" and n <= page_obj.number|add:"2" %}
           <li class="page-item">
-            <a class="page-link js-title-page" href="#" data-page="{{ n }}">{{ n }}</a>
+            <a class="page-link js-position-page" href="#" data-page="{{ n }}">{{ n }}</a>
           </li>
         {% endif %}
       {% endfor %}
 
       <li class="page-item {% if not page_obj.has_next %}disabled{% endif %}">
-        <a class="page-link js-title-page" href="#"
+        <a class="page-link js-position-page" href="#"
            data-page="{% if page_obj.has_next %}{{ page_obj.next_page_number }}{% else %}{{ page_obj.paginator.num_pages }}{% endif %}">›</a>
       </li>
     </ul>

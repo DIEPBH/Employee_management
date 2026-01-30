@@ -67,14 +67,78 @@
     <!-- SIDEBAR -->
     <div id="sidebar-wrapper">
         <div class="sidebar-heading">MENU</div>
-        <div class="list-group list-group-flush">
-            <a href="{% url 'employee:index' %}" class="list-group-item list-group-item-action">🏠 Trang chủ</a>
-            <a href="{% url 'employee:index' %}" class="list-group-item list-group-item-action">👤 Quản lý cán bộ</a>
-            <a href="{% url 'employee:index_emp_tile' %}" class="list-group-item list-group-item-action">➕ Quản lý chức danh cán bộ</a>
-            <a href="#" class="list-group-item list-group-item-action">📊 Thống kê</a>
-            <a href="#" class="list-group-item list-group-item-action">⚙ Cài đặt</a>
-        </div>
+
+            <div class="list-group list-group-flush">
+
+            <!-- Trang chủ -->
+            <a href="{% url 'employee:index' %}" class="list-group-item list-group-item-action">
+                <i class="fa-solid fa-house"></i>
+                Trang chủ
+            </a>
+
+            <!-- QUẢN LÝ CÁN BỘ (Cấp 1) -->
+            <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+                data-bs-toggle="collapse"
+                href="#menu-qlcb"
+                role="button"
+                aria-expanded="false"
+                aria-controls="menu-qlcb">
+                <i class="fa-solid fa-user"></i>Quản lý cán bộ
+                <span class="ms-2">▾</span>
+            </a>
+
+            <!-- Cấp 2 -->
+            <div class="collapse" id="menu-qlcb">
+                <a href="{% url 'employee:index' %}"
+                class="list-group-item list-group-item-action ps-4">
+                <i class="fa-solid fa-users me-2"></i> Quản lý cán bộ
+                </a>
+
+                <a href="{% url 'employee:index_emp_tile' %}"
+                class="list-group-item list-group-item-action ps-4">
+                <i class="fa-solid fa-user-plus"></i> Quản lý chức danh cán bộ
+                </a>
+
+                <a href="{% url 'employee:index_emp_position' %}"
+                class="list-group-item list-group-item-action ps-4">
+                <i class="fa-solid fa-users me-2"></i> Quy hoạch chức danh cán bộ
+                </a>
+            </div>
+
+            <!-- THỐNG KÊ - BÁO CÁO (Cấp 1) -->
+            <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+                data-bs-toggle="collapse"
+                href="#menu-report"
+                role="button"
+                aria-expanded="false"
+                aria-controls="menu-report">
+                <i class="fa-solid fa-chart-line"></i>
+                Thống kê - Báo cáo
+                <span class="ms-2">▾</span>
+            </a>
+
+            <!-- Cấp 2 -->
+            <div class="collapse" id="menu-report">
+                <a href="#"
+                class="list-group-item list-group-item-action ps-4">
+                • Thống kê CBCS
+                </a>
+
+                <a href="#"
+                class="list-group-item list-group-item-action ps-4">
+                • (Báo cáo theo phòng ban…)
+                </a>
+            </div>
+
+            <!-- Cài đặt -->
+            <a href="#" class="list-group-item list-group-item-action">
+                <i class="fa-solid fa-gear"></i>
+                Cài đặt
+            </a>
+
+            </div>
     </div>
+
 
     <!-- PAGE CONTENT -->
     <div id="page-content-wrapper" class="flex-grow-1 w-100">
@@ -109,20 +173,35 @@
             </div>
 </div>
 
-<!-- JS -->
+<!-- JS nền tảng -->
 <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
 <script src="{% static 'js/scripts.js' %}"></script>
 <script src="{% static 'js/table.js' %}"></script>
 <script src="{% static 'js/search-panel.js' %}"></script>
-    <!-- Global Modal JS -->
+
+<!-- 0) INIT ModalHooks -->
+<script src="{% static 'hooks/modal-hooks-init.js' %}"></script>
+
+<!-- 1) CORE modal -->
 <script src="{% static 'js/core/app-modal.js' %}"></script>
+<script src="{% static 'js/core/app-sub-modal.js' %}"></script>
+
+<!-- 2) HOOK điều khiển modal / submit -->
 <script src="{% static 'hooks/app-modal.js' %}"></script>
 <script src="{% static 'hooks/app-modal-form.js' %}"></script>
 <script src="{% static 'hooks/app-submodal-form.js' %}"></script>
-<script src="{% static 'hooks/employee-modal.js' %}"></script>
-<script src="{% static 'hooks/emp-title-manage.js' %}"></script>
+
+<!-- 3) HOOK dùng chung -->
 <script src="{% static 'hooks/enhance-file-field.js' %}"></script>
-<script src="{% static 'hooks/emp-title-form.js' %}"></script>
-<script src="{% static 'js/core/app-sub-modal.js' %}"></script>
 <script src="{% static 'hooks/common/lookup-employee.js' %}"></script>
+
+<!-- 4) FACTORY + PRESET -->
+<script src="{% static 'hooks/emp-entity-manage.factory.js' %}"></script>
+<script src="{% static 'hooks/emp-entity-presets.js' %}"></script>
+
+<!-- 5) HOOK NGHIỆP VỤ -->
+
+<script src="{% static 'hooks/emp-entity-hooks.js' %}"></script>
+
+
 </body>

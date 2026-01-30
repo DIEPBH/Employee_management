@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, JsonResponse
-from employee.form import EmpInformationForm, EmpTitleForm
-from .models import Emp_information, Emp_Title
+from employee.form import EmpInformationForm, EmpTitleForm, EmpPositionForm
+from .models import Emp_information, Emp_Title, Emp_Position
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.views.decorators.http import require_POST
@@ -181,11 +181,11 @@ def index_emp_tile(request):
         # lọc dữ liệu theo tham số tìm kiếm
         emp_tile = Emp_Title.objects.select_related('emp').order_by('created_at')
         if emp_num:
-            employees = employees.filter(emp_num__icontains=emp_num)
+            emp_tile = emp_tile.filter(emp__emp_num__icontains=emp_num)
         if full_name:
-            employees = employees.filter(full_name__icontains=full_name)
+            emp_tile = emp_tile.filter(emp__full_name__icontains=full_name)
         if decision_number:
-            employees = employees.filter(decision_number__icontains=decision_number)
+            emp_tile = emp_tile.filter(decision_number__icontains=decision_number)
         if decision_date:
             decision_date = None
             try:
@@ -199,7 +199,7 @@ def index_emp_tile(request):
                     pass
             # CHỈ lọc khi parse thành công
             if decision_date is not None:
-                employees = employees.filter(decision_date=decision_date)
+                emp_tile = emp_tile.filter(decision_date=decision_date)
         
         paginator = Paginator(emp_tile, 10)  # Hiển thị 10 dòng
         page_number = request.GET.get('page')
@@ -254,6 +254,7 @@ def emp_title_form(request):
             obj.created_by = request.user
             obj.created_at = datetime.now()
             obj.emp = emp
+            obj.is_active = 'Y'
             obj.save()
             return JsonResponse({"success": True})
 
@@ -268,7 +269,6 @@ def emp_title_form(request):
     return JsonResponse({"success": True, "html": html})
 
 # API bảng chức danh của cán bộ
-
 @login_required
 def employee_titles_table(request, emp_num):
     qs = (
@@ -295,7 +295,7 @@ def employee_titles_table(request, emp_num):
     return JsonResponse({"success": True, "html": html})
 
 # Sửa chức danh của cán bộ
-@login_required
+@login_required #modal
 def emp_title_edit_modal(request, id):
     title = get_object_or_404(Emp_Title, id=id)
     if request.method == "POST":
@@ -321,11 +321,11 @@ def emp_title_edit_modal(request, id):
     )
     return JsonResponse({"success": True, "html": html})
 
+
 #Xem chức danh của cán bộ:
 @login_required
 def emp_title_view_modal(request, id):
     title = get_object_or_404(Emp_Title, id=id)
-
 
     form = EmpTitleForm(instance=title)
     for field in form.fields.values():
@@ -350,3 +350,126 @@ def emp_title_delete(request, id):
     title.delete()
     messages.success(request, 'Bản ghi đã được xóa thành công.')
     return JsonResponse({"success": True})
+
+@login_required #Xóa trên màn search
+def emp_title_delete_(request, id):
+    if request.method != "POST":
+        return JsonResponse({"success": False, "message": "Method not allowed"}, status=405)
+
+    title = get_object_or_404(Emp_Title, id=id)
+    title.delete()
+    messages.success(request, 'Bản ghi đã được xóa thành công.')
+    return redirect('employee:index_emp_tile')
+
+
+###############################################################
+############ Views quản lý quy hoạch chức danh cán bộ##########
+###############################################################
+
+@login_required
+def index_emp_position(request):
+    if request.user.is_authenticated:
+        # tham số tìm kiếm
+        emp_num = request.GET.get('emp_num', '')
+        full_name = request.GET.get('full_name', '')
+        date_position = request.GET.get('date_position', '').strip()
+        # lọc dữ liệu theo tham số tìm kiếm
+        emp_position = Emp_Position.objects.select_related('emp').order_by('created_at')
+        if emp_num:
+            emp_position = emp_position.filter(emp__emp_num__icontains=emp_num)
+        if full_name:
+            emp_position = emp_position.filter(emp__full_name__icontains=full_name)
+        
+        if date_position:
+            date_position = None
+            try:
+                date_position = datetime.strptime(date_position, "%d/%m/%Y").date()
+            except ValueError:
+                pass
+            if date_position is None:
+                try:
+                    date_position = datetime.strptime(date_position, "%Y-%m-%d").date()
+                except ValueError:
+                    pass
+            # CHỈ lọc khi parse thành công
+            if date_position is not None:
+                emp_position = emp_position.filter(date_position=date_position)
+        
+        paginator = Paginator(emp_position, 10)  # Hiển thị 10 dòng
+        page_number = request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+
+        # Giữ nguyên các tham số tìm kiếm khi phân trang
+        params = request.GET.copy()
+        params.pop("page", None)  # bỏ page cũ
+        for k in list(params.keys()):
+            if not (params.get(k) or "").strip():
+                params.pop(k, None)
+        querystring = urlencode(params)
+
+        return render(request, 'position/index_emp_position.html', {'positions': page_obj, 'page_obj': page_obj, 'paginator': paginator, 'querystring': querystring})
+
+#Modal thêm quy hoạch cán bộ   
+@login_required
+def position_manager_modal(request):
+    html = render_to_string("position/position_manager_modal.html", {}, request=request)
+    return JsonResponse({"success": True, "html": html})
+
+#submit form thêm quy hoạch chức danh cho cán bộ
+@login_required
+def emp_position_form(request):
+    emp_num = request.GET.get("emp_num") or request.POST.get("emp_num")
+    if not emp_num:
+        return JsonResponse({"success": False, "html": "<div class='alert alert-danger'>Thiếu mã cán bộ</div>"})
+    try:
+        emp  = Emp_information.objects.get(emp_num=emp_num)
+    except Emp_information.DoesNotExist:
+        return JsonResponse({"success": False, "html": "<div class='alert alert-danger'>Cán bộ không tồn tại</div>"})
+    
+    if request.method == "POST":
+        form = EmpPositionForm(request.POST, request.FILES)
+        form.instance.emp = emp
+        if form.is_valid():
+            obj = form.save(commit=False)
+            obj.created_by = request.user
+            obj.created_at = datetime.now()
+            obj.emp = emp
+            obj.is_active = 'Y'
+            obj.save()
+            return JsonResponse({"success": True})
+
+        html = render_to_string("position/position_form.html", {"form": form, 
+                                                          "emp_num": emp_num, 
+                                                          "post_url": reverse("employee:emp_position_form"), "mode": "add"}, request=request)
+        return JsonResponse({"success": False, "html": html, "errors": form.errors})
+
+    form = EmpPositionForm(initial={"emp_num": emp_num})
+    html = render_to_string("position/position_form.html", {"form": form, "emp_num": emp_num,
+                                                       "post_url": reverse("employee:emp_position_form"), "mode": "add"}, request=request)
+    return JsonResponse({"success": True, "html": html})
+
+# API bảng quy hoạch chức danh của cán bộ
+@login_required
+def employee_position_table(request, emp_num):
+    qs = (
+    Emp_Position.objects
+    .select_related("position")
+    .filter(emp=emp_num)
+    .order_by("-created_at")
+    )
+
+    paginator = Paginator(qs, 10) # <-- đổi 10 dòng/trang 
+    raw_page = request.GET.get("page", "1")
+    try:
+        page_number = int(raw_page)
+    except (TypeError, ValueError):
+        page_number = 1
+
+
+    if page_number < 1:
+        page_number = 1
+
+    page_obj = paginator.get_page(page_number)
+
+    html = render_to_string("position/position_table.html",{"page_obj": page_obj, "emp_num": emp_num},request=request,)
+    return JsonResponse({"success": True, "html": html})

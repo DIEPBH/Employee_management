@@ -1,9 +1,8 @@
 {% extends 'base.html' %}
-{% load static %}
 {% block content %}
     <div class="container-fluid page-header">
         <i class="fa-solid fa-users me-2"></i>
-        <h1>TRA CỨU THÔNG TIN CHỨC DANH CÁN BỘ</h1>
+        <h1>TRA CỨU THÔNG TIN QUY HOẠCH CHỨC DANH CÁN BỘ</h1>
     </div>
     <!-- Khu vực tìm kiếm -->
         <div class="container-fluid mt-3 px-0" id="search-panel-wrapper">
@@ -29,15 +28,9 @@
                         </div>
 
                         <div class="search-item">
-                            <label class="search-label">Số quyết định</label>
-                            <input type="text" name="decision_number" class="search-control"
-                                value="{{ request.GET.decision_number|default:'' }}" placeholder="Nhập số quyết định">
-                        </div>
-
-                        <div class="search-item">
                             <label class="search-label">Ngày quyết định</label>
-                            <input type="date" name="dob" class="search-control"
-                                value="{{ request.GET.dob|default:'' }}">
+                            <input type="text" name="date_position" class="search-control"
+                                value="{{ request.GET.date_position|default:'' }}" placeholder="Nhập ngày quyết định">
                         </div>
                     </div>
 
@@ -45,7 +38,7 @@
                     <button type="submit" class="btn btn-primary">Tìm kiếm</button>
 
                     <!-- Nút reset: quay về trang index không có query -->
-                    <a href="{% url 'employee:index_emp_tile' %}" class="btn btn-outline-secondary">Xóa lọc</a>
+                    <a href="{% url 'employee:index_emp_position' %}" class="btn btn-outline-secondary">Xóa lọc</a>
                     </div>
                 </form>
             </div>
@@ -55,9 +48,9 @@
     <div class="d-flex justify-content-end align-items-center mt-3">
         <button
             class="btn btn-success js-open-modal"
-            data-modal-url="{% url 'employee:title_manager_modal' %}"
-            data-modal-title="Thêm mới thông tin chức danh"
-            data-modal-type="emp_title_manage">
+            data-modal-url="{% url 'employee:position_manager_modal' %}"
+            data-modal-title="Thêm mới thông tin quy hoạch"
+            data-modal-type="emp_position_manage">
             <i class="fa-solid fa-plus me-2"></i> Thêm mới
         </button>
     </div>
@@ -86,31 +79,19 @@
                                 <div class="col-resizer"></div>
                             </th>
                             <th>
-                                <span class="th-ellipsis">Chức danh</span>
+                                <span class="th-ellipsis">Chức vụ</span>
                                 <div class="col-resizer"></div>
                             </th>
                             <th>
-                                <span class="th-ellipsis">Phụ cấp</span>
+                                <span class="th-ellipsis">Ngày quy hoạch</span>
                                 <div class="col-resizer"></div>
                             </th>
                             <th>
-                                <span class="th-ellipsis">Ngày tháng nhận</span>
+                                <span class="th-ellipsis">Số phiếu bầu</span>
                                 <div class="col-resizer"></div>
                             </th>
                             <th>
-                                <span class="th-ellipsis">Hình thức bổ nhiệm</span>
-                                <div class="col-resizer"></div>
-                            </th>
-                            <th>
-                                <span class="th-ellipsis">Số quyết định</span>
-                                <div class="col-resizer"></div>
-                            </th>
-                            <th>
-                                <span class="th-ellipsis">Ngày quyết định</span>
-                                <div class="col-resizer"></div>
-                            </th>
-                            <th>
-                                <span class="th-ellipsis">Tháng/năm thôi</span>
+                                <span class="th-ellipsis">Ngày dừng quy hoạch</span>
                                 <div class="col-resizer"></div>
                             </th>
                             <th>
@@ -132,21 +113,19 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for title in titles %}
+                        {% for position in positions %}
                         <tr>
-                            <td data-bs-toggle="tooltip" title="{{ title.id }}">{{ title.id }}</td>
-                            <td data-bs-toggle="tooltip" title="{{ title.emp }}">{{ title.emp.emp_num }}</td>
-                            <td class = "col-fullname">{{ title.emp.full_name }}</td>
-                            <td data-bs-toggle="tooltip" title="{{ title.emp_title }}">{{ title.emp_title }}</td>
-                            <td data-bs-toggle="tooltip" title="{{ title.allowances }}">{{ title.allowances }}</td>
-                            <td data-bs-toggle="tooltip" title="{{ title.date_of_receipt }}">{{ title.date_of_receipt|date:"d/m/Y"|default_if_none:"" }}</td>
-                            <td data-bs-toggle="tooltip" title="{{ title.form_of_appointment }}">{{ title.form_of_appointment }}</td>
-                            <td data-bs-toggle="tooltip" title="{{ title.decision_number }}">{{ title.decision_number }}</td>
-                            <td data-bs-toggle="tooltip" title="{{ title.decision_date }}">{{ title.decision_date|date:"d/m/Y"|default_if_none:"" }}</td>
-                            <td data-bs-toggle="tooltip" title="{{ title.created_by }}">{{ title.created_by }}</td>
-                            <td data-bs-toggle="tooltip" title="{{ title.created_at }}">{{ title.created_at|date:"d/m/Y"|default_if_none:"" }}</td>
-                            <td data-bs-toggle="tooltip" title="{{ title.update_by }}">{{ title.update_by }}</td>
-                            <td data-bs-toggle="tooltip" title="{{ title.update_at }}">{{ title.update_at|date:"d/m/Y"|default_if_none:"" }}</td>
+                            <td data-bs-toggle="tooltip" title="{{ position.id }}">{{ position.id }}</td>
+                            <td data-bs-toggle="tooltip" title="{{ position.emp }}">{{ position.emp.emp_num }}</td>
+                            <td class = "col-fullname">{{ position.emp.full_name }}</td>
+                            <td data-bs-toggle="tooltip" title="{{ position.position }}">{{ position.position }}</td>
+                            <td data-bs-toggle="tooltip" title="{{ position.date_of_receipt }}">{{ position.date_position|date:"d/m/Y"|default_if_none:"" }}</td>
+                            <td data-bs-toggle="tooltip" title="{{ position.votes }}">{{ position.votes }}</td>
+                            <td data-bs-toggle="tooltip" title="{{ position.date_stop_position }}">{{ position.date_stop_position|date:"d/m/Y"|default_if_none:"" }}</td>
+                            <td data-bs-toggle="tooltip" title="{{ position.created_by }}">{{ position.created_by }}</td>
+                            <td data-bs-toggle="tooltip" title="{{ position.created_at }}">{{ position.created_at|date:"d/m/Y"|default_if_none:"" }}</td>
+                            <td data-bs-toggle="tooltip" title="{{ position.update_by }}">{{ position.update_by }}</td>
+                            <td data-bs-toggle="tooltip" title="{{ position.update_at }}">{{ position.update_at|date:"d/m/Y"|default_if_none:"" }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -163,19 +142,19 @@
                         </thead>
 
                         <tbody>
-                            {% for title in titles %}
+                            {% for position in positions %}
                             <tr>
                             <td>
                                 <button
                                     class="btn btn-sm btn-warning js-open-modal"
-                                    data-modal-url="{% url 'employee:emp_title_view_modal' title.id %}"
+                                    data-modal-url="#"
                                     data-modal-title="Xem thông tin cán bộ"
-                                    data-modal-type="emp_title_manage">
+                                    data-modal-type="emp_position_manage">
                                     <i class="fa-solid fa-eye"></i>
                                 </button>
                             </td>
                             <td>
-                                <form action="{% url 'employee:emp_title_delete_' title.id %}" method="post">
+                                <form action="#" method="post">
                                 {% csrf_token %}
                                 <button type="submit" class="btn btn-sm btn-danger"
                                         onclick="return confirm('Bạn có chắc chắn muốn xóa')" title="Xóa">
@@ -210,9 +189,4 @@
                 {% endif %}
             </div>
     </div>
-{% endblock %}
-
-{% block script %}
-<script src="{% static 'hooks/emp-title-manage.js' %}"></script>
-<script src="{% static 'hooks/emp-title-form.js' %}"></script>
 {% endblock %}

@@ -1,0 +1,33 @@
+<div class = "row">
+<div class="col-md-4">
+  <label class="form-label">Mã cán bộ</label>
+
+
+    <div class="emp-lookup">
+      <input id="empCode"
+      class="form-control"
+      autocomplete="off"
+      placeholder="Nhập mã cán bộ...">
+
+
+    <!-- dropdown custom -->
+      <div id="empSuggest" class="emp-suggest d-none"></div>
+    </div>
+    
+</div>
+<div class="col-md-4">
+    <label class="form-label">Họ tên</label>
+    <input id="empName" class="form-control" readonly>
+  </div>
+</div>
+
+<hr class="my-3">
+
+<div class="d-flex justify-content-between">
+    <h6>Danh sách chức vụ</h6>
+    <button class="btn btn-sm btn-primary js-add-position">+ Thêm</button>
+</div>
+<div id="childTableWrap" class="mt-2"></div>
+
+<div class="mt-2" id="empPositionTableWrap">
+</div>

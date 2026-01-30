@@ -1,5 +1,5 @@
 from django import forms
-from .models import Emp_information,Emp_Title
+from .models import Emp_information,Emp_Title,Emp_Position
 from datetime import datetime
 from django.core.exceptions import ValidationError
 
@@ -66,3 +66,29 @@ class EmpTitleForm(forms.ModelForm):
             raise forms.ValidationError("Ngày hết hiệu lực quyết định không thể lớn hơn ngày quyết định.")
         return stop_decision_date
     
+class EmpPositionForm(forms.ModelForm):
+    class Meta:
+        model = Emp_Position
+        fields = ['position','date_position','votes','date_stop_position','reason_stop_position','file']
+        widgets = {
+            'votes': forms.NumberInput(attrs={'step':'1'}),
+            'date_position': forms.DateInput(attrs={'type': 'date'}),
+            'date_stop_position': forms.DateInput(attrs={'type': 'date'}),
+            'reason_stop_position': forms.Textarea
+        }
+    def clean_date_position(self):
+        date_position = self.cleaned_data.get('date_position')
+        if date_position and date_position > datetime.now().date():
+            raise forms.ValidationError("Ngày nhận quy hoạch không thể lớn hơn ngày hiện tại.")
+        return date_position
+    def clean_date_stop_position(self):
+        date_stop_position = self.cleaned_data.get('date_stop_position')
+        if date_stop_position and date_stop_position > datetime.now().date():
+            raise forms.ValidationError("Ngày dừng quy hoạch không thể lớn hơn ngày hiện tại.")
+        return date_stop_position
+    def clean_date_stop_position_1(self):
+        date_stop_position = self.cleaned_data.get('date_stop_position')
+        date_position = self.cleaned_data.get('date_position')
+        if date_stop_position and date_stop_position > date_position:
+            raise forms.ValidationError("Ngày hết hiệu lực quyết định không thể lớn hơn ngày quyết định.")
+        return date_stop_position
