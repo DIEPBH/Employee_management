@@ -54,6 +54,7 @@
             <i class="fa-solid fa-plus me-2"></i> Thêm mới
         </button>
     </div>
+    
 
 
 
@@ -124,8 +125,17 @@
                             <td data-bs-toggle="tooltip" title="{{ position.date_stop_position }}">{{ position.date_stop_position|date:"d/m/Y"|default_if_none:"" }}</td>
                             <td data-bs-toggle="tooltip" title="{{ position.created_by }}">{{ position.created_by }}</td>
                             <td data-bs-toggle="tooltip" title="{{ position.created_at }}">{{ position.created_at|date:"d/m/Y"|default_if_none:"" }}</td>
-                            <td data-bs-toggle="tooltip" title="{{ position.update_by }}">{{ position.update_by }}</td>
-                            <td data-bs-toggle="tooltip" title="{{ position.update_at }}">{{ position.update_at|date:"d/m/Y"|default_if_none:"" }}</td>
+                            <td data-bs-toggle="tooltip" title="{{ position.update_by }}">{% if position.update_by %}
+                                {{ position.update_by }}
+                                {%else%}
+                                -
+                                {%endif%}</td>
+                            <td data-bs-toggle="tooltip" title="{{ position.update_at }}">
+                                {% if position.update_at %}
+                                {{ position.update_at|date:"d/m/Y"|default_if_none:"" }}</td>
+                                {% else %}
+                                    -
+                                {%endif%}</td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -147,14 +157,14 @@
                             <td>
                                 <button
                                     class="btn btn-sm btn-warning js-open-modal"
-                                    data-modal-url="#"
-                                    data-modal-title="Xem thông tin cán bộ"
+                                    data-modal-url="{% url 'employee:emp_position_view_modal' position.id %}"
+                                    data-modal-title="Xem thông tin quy hoạch chức vụ"
                                     data-modal-type="emp_position_manage">
                                     <i class="fa-solid fa-eye"></i>
                                 </button>
                             </td>
                             <td>
-                                <form action="#" method="post">
+                                <form action="{% url 'employee:emp_position_delete_' position.id %}" method="post">
                                 {% csrf_token %}
                                 <button type="submit" class="btn btn-sm btn-danger"
                                         onclick="return confirm('Bạn có chắc chắn muốn xóa')" title="Xóa">

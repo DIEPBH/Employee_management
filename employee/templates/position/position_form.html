@@ -2,7 +2,7 @@
 {% if mode == "view" %}
   <form>
 {% else %}
-  <form method="post"
+  <form method="POST"
         enctype="multipart/form-data"
         action="{{ post_url|default:request.path }}"
         data-ajax="1"

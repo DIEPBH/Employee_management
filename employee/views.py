@@ -15,6 +15,7 @@ from urllib.parse import urlencode
 from django.template.loader import render_to_string
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
+import logging
 # Create your views here.
 
 ###########################################
@@ -428,6 +429,7 @@ def emp_position_form(request):
     
     if request.method == "POST":
         form = EmpPositionForm(request.POST, request.FILES)
+        logging.debug("emp: %r", emp)
         form.instance.emp = emp
         if form.is_valid():
             obj = form.save(commit=False)
@@ -473,3 +475,69 @@ def employee_position_table(request, emp_num):
 
     html = render_to_string("position/position_table.html",{"page_obj": page_obj, "emp_num": emp_num},request=request,)
     return JsonResponse({"success": True, "html": html})
+
+# Sửa quy hoạch chức danh của cán bộ
+@login_required #modal
+def emp_position_edit_modal(request, id):
+    position = get_object_or_404(Emp_Position, id=id)
+    if request.method == "POST":
+        form = EmpPositionForm(request.POST, request.FILES, instance=position)
+        if form.is_valid():
+            form.save()
+            return JsonResponse({"success": True})
+
+        html = render_to_string(
+            "position/position_form.html",
+            {"form": form,
+             "post_url": reverse("employee:emp_position_edit_modal", args=[position.id])},
+            request=request
+        )
+        return JsonResponse({"success": False, "html": html})
+    # GET
+    form = EmpPositionForm(instance=position)
+    html = render_to_string(
+        "position/position_form.html",
+        {"form": form,
+         "post_url": reverse("employee:emp_position_edit_modal", args=[position.id])},
+        request=request
+    )
+    return JsonResponse({"success": True, "html": html})
+
+#Xem quy hoạch chức danh của cán bộ:
+@login_required
+def emp_position_view_modal(request, id):
+    position = get_object_or_404(Emp_Position, id=id)
+
+    form = EmpPositionForm(instance=position)
+    for field in form.fields.values():
+        field.disabled = True
+    html = render_to_string(
+    "position/position_form.html",
+    {
+    "form": form,
+    "mode": "view", 
+    },
+    request=request
+    )
+    return JsonResponse({"success": True, "html": html})
+
+# Xóa bản ghi quy hoạch chức danh:
+@login_required
+def emp_position_delete(request, id):
+    if request.method != "POST":
+        return JsonResponse({"success": False, "message": "Method not allowed"}, status=405)
+
+    position = get_object_or_404(Emp_Position, id=id)
+    position.delete()
+    messages.success(request, 'Bản ghi đã được xóa thành công.')
+    return JsonResponse({"success": True})
+
+@login_required #Xóa trên màn search
+def emp_position_delete_(request, id):
+    if request.method != "POST":
+        return JsonResponse({"success": False, "message": "Method not allowed"}, status=405)
+
+    position = get_object_or_404(Emp_Position, id=id)
+    position.delete()
+    messages.success(request, 'Bản ghi đã được xóa thành công.')
+    return redirect('employee:index_emp_position')

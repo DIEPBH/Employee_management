@@ -1,14 +1,15 @@
 {# ================= FORM OPEN ================= #}
 {% if mode == "view" %}
   <form>
+  {% csrf_token %}
 {% else %}
-  <form method="post"
+  <form method="POST"
         enctype="multipart/form-data"
         action="{{ post_url|default:request.path }}"
         data-ajax="1"
         data-modal-type="emp_title_form">
     {% csrf_token %}
-  {% endif %}
+{% endif %}
 
   {# ================= ERROR BLOCK ================= #}
   {% if form.errors and mode != "view" %}

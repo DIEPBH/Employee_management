@@ -53,21 +53,21 @@
 
           <td class="st-actions">
             <button class="btn btn-outline-info btn-sm"
-              data-open-child data-url="#" 
+              data-open-child data-url="{% url 'employee:emp_position_view_modal' r.id %}" 
               data-title="Xem chức vụ" 
-              data-type="emp_title_form">
+              data-type="emp_position_form">
               Xem
             </button>
             <button class="btn btn-outline-primary btn-sm"
               data-open-child 
-              data-url="#" 
-              data-title="Sửa chức vụ" 
-              data-type="emp_title_form">
+              data-url="{% url 'employee:emp_position_edit_modal' r.id %}" 
+              data-title="Sửa quy hoạch chức vụ" 
+              data-type="emp_position_form">
               Sửa
             </button>
             
             <button class="btn btn-outline-danger btn-sm js-delete-position"
-              data-delete-title data-url="#">
+              data-delete-title data-url="{% url 'employee:emp_position_delete' r.id %}">
               Xóa
             </button>
 

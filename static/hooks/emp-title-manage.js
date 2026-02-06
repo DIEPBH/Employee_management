@@ -135,7 +135,7 @@ ModalHooks["emp_title_manage"] = {
     // Thêm chức vụ (modal con)
     btnAdd.addEventListener("click", () => {
       if (!currentEmpNum) return;
-
+      console.log("add called")
       AppModalStack.openChild(`/titles/add/?emp_num=${encodeURIComponent(currentEmpNum)}`, {
         title: "Thêm chức vụ",
         type: "emp_title_form",

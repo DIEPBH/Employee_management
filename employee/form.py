@@ -37,8 +37,7 @@ class EmpTitleForm(forms.ModelForm):
         model = Emp_Title
         fields = ['emp_title','allowances','date_of_receipt','form_of_appointment','decision_number','decision_date','stop_decision_date','file']
         widgets = {
-            'emp_num': forms.TextInput(attrs={'readonly': 'readonly'}),
-            'full_name': forms.TextInput(attrs={'readonly': 'readonly'}),
+
             'allowances': forms.NumberInput(attrs={'step': '0.01'}),
             'date_of_receipt': forms.DateInput(attrs={'type': 'date'}),
             'decision_date': forms.DateInput(attrs={'type': 'date'}),
@@ -59,13 +58,16 @@ class EmpTitleForm(forms.ModelForm):
         if stop_decision_date and stop_decision_date > datetime.now().date():
             raise forms.ValidationError("Ngày hết hiệu lực quyết định không thể lớn hơn ngày hiện tại.")
         return stop_decision_date
-    def clean_stop_decision_date_1(self):
+    def clean(self):
+        cleaned = super().clean()
         stop_decision_date = self.cleaned_data.get('stop_decision_date')
         decision_date = self.cleaned_data.get('decision_date')
-        if stop_decision_date and stop_decision_date > decision_date:
-            raise forms.ValidationError("Ngày hết hiệu lực quyết định không thể lớn hơn ngày quyết định.")
-        return stop_decision_date
+        if decision_date and stop_decision_date:
+            if stop_decision_date and stop_decision_date < decision_date:
+                raise forms.ValidationError("Ngày hết hiệu lực quyết định không thể lớn hơn ngày quyết định.")
+        return cleaned
     
+
 class EmpPositionForm(forms.ModelForm):
     class Meta:
         model = Emp_Position

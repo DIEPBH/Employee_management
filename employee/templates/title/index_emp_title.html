@@ -62,6 +62,17 @@
         </button>
     </div>
 
+    <!-- Nút import -->
+    <div class="d-flex justify-content-end align-items-center mt-3">
+        <button
+            class="btn btn-success js-open-modal"
+            data-modal-url="#"
+            data-modal-title="Import thông tin chức danh"
+            data-modal-type="emp_title_manage">
+            <i class="fa-solid fa-plus me-2"></i> Import
+        </button>
+    </div>
+
 
 
     <!-- Khu vực bảng dữ liệu -->
@@ -143,10 +154,22 @@
                             <td data-bs-toggle="tooltip" title="{{ title.form_of_appointment }}">{{ title.form_of_appointment }}</td>
                             <td data-bs-toggle="tooltip" title="{{ title.decision_number }}">{{ title.decision_number }}</td>
                             <td data-bs-toggle="tooltip" title="{{ title.decision_date }}">{{ title.decision_date|date:"d/m/Y"|default_if_none:"" }}</td>
+                            <td data-bs-toggle="tooltip" title="{{ title.stop_decision_date }}">{{ title.stop_decision_date|date:"d/m/Y"|default_if_none:"" }}</td>
                             <td data-bs-toggle="tooltip" title="{{ title.created_by }}">{{ title.created_by }}</td>
                             <td data-bs-toggle="tooltip" title="{{ title.created_at }}">{{ title.created_at|date:"d/m/Y"|default_if_none:"" }}</td>
-                            <td data-bs-toggle="tooltip" title="{{ title.update_by }}">{{ title.update_by }}</td>
-                            <td data-bs-toggle="tooltip" title="{{ title.update_at }}">{{ title.update_at|date:"d/m/Y"|default_if_none:"" }}</td>
+                            <td data-bs-toggle="tooltip" title="{{ title.update_by }}">
+                                {% if title.update_by %}
+                                {{ title.update_by }}
+                                {%else%}
+                                -
+                                {%endif%}
+                            </td>
+                            <td data-bs-toggle="tooltip" title="{{ title.update_at }}">
+                                {% if title.update_at %}
+                                {{ title.update_at|date:"d/m/Y"|default_if_none:"" }}</td>
+                                {% else %}
+                                    -
+                                {%endif%}
                         </tr>
                         {% endfor %}
                     </tbody>

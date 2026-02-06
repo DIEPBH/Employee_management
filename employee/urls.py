@@ -28,5 +28,8 @@ urlpatterns = [
     path("api/employee/<str:emp_num>/position/", views.employee_position_table, name="employee_position_table"),
     path("positions/add/", views.emp_position_form, name="emp_position_form"),
     path('add_position/', views.position_manager_modal, name='position_manager_modal'),
-
+    path("positions/<int:id>/edit/", views.emp_position_edit_modal, name="emp_position_edit_modal"),#Sửa trên Modal
+    path("positions/<int:id>/view/", views.emp_position_view_modal, name="emp_position_view_modal"), 
+    path("positions/<int:id>/delete/", views.emp_position_delete, name="emp_position_delete"),
+    path("positions/<int:id>/delete_/", views.emp_position_delete_, name="emp_position_delete_"), #Xóa trên search
 ]
