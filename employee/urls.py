@@ -1,5 +1,6 @@
 from django.urls import path,include
 from . import views
+from .view_modules.emp_title_import import emp_title_import_modal
 
 app_name = 'employee'
 
@@ -22,6 +23,7 @@ urlpatterns = [
     path("titles/<int:id>/view/", views.emp_title_view_modal, name="emp_title_view_modal"), 
     path("titles/<int:id>/delete/", views.emp_title_delete, name="emp_title_delete"),
     path("titles/<int:id>/delete_/", views.emp_title_delete_, name="emp_title_delete_"), #Xóa trên search
+    path("emp-title/import/", emp_title_import_modal, name="emp_title_import_modal"),
 
     #Quy hoạch cán bộ
     path('positions/', views.index_emp_position, name = 'index_emp_position'),

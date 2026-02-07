@@ -25,12 +25,16 @@
   }
 
   async function fetchJSON(url, options = {}) {
-    const res = await fetch(url, {
-      headers: { "X-Requested-With": "XMLHttpRequest" },
-      ...options
+  const res = await fetch(url, {
+    ...options,
+    headers: {
+      "X-Requested-With": "XMLHttpRequest",
+      ...(options.headers || {})
+    }
     });
     return res.json();
   }
+
 
   async function open(url, opts = {}) {
     const { title = "", type = null } = opts;
@@ -49,9 +53,13 @@
       }
 
       bodyEl.innerHTML = data.html;
-      window.ModalHooks?.[type]?.onLoaded?.(bodyEl);
+      if (currentType && window.ModalHooks && typeof ModalHooks[currentType] === "function") 
+      {
+      ModalHooks[currentType]({ modalEl, bodyEl, titleEl, type: currentType, url });
+      }
+      window.ModalHooks?.[currentType]?.onLoaded?.(bodyEl);
 
-    } catch {
+    } catch (err) {
       bodyEl.innerHTML = "<div class='alert alert-danger'>Lỗi tải dữ liệu</div>";
     }
   }

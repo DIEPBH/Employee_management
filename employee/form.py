@@ -68,6 +68,11 @@ class EmpTitleForm(forms.ModelForm):
         return cleaned
     
 
+#form import từ file excel
+class EmpImportForm(forms.Form):
+    excel_file = forms.FileField() 
+
+#form thêm mới quy hoạch cho cán bộ
 class EmpPositionForm(forms.ModelForm):
     class Meta:
         model = Emp_Position

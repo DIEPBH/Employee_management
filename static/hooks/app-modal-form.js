@@ -24,6 +24,7 @@ document.addEventListener("submit", async (e) => {
     if (data.success) {
       window.ModalHooks?.[type]?.onSuccess?.(data);
       AppModal.close();
+      window.location.reload();
       return;
     }
 
