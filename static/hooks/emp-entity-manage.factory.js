@@ -57,7 +57,7 @@
       notifyError = (m) => alert(m),
       confirmDeleteText = "Bạn có chắc chắn muốn xoá bản ghi này?",
     } = cfg;
-
+    
     if (typeof listUrl !== "function" || typeof addUrl !== "function") {
       throw new Error("createEmpEntityManageHook: listUrl/addUrl is required");
     }

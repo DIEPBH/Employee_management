@@ -1,5 +1,5 @@
 from django import forms
-from .models import Emp_information,Emp_Title,Emp_Position
+from .models import Emp_Training, Emp_information,Emp_Title,Emp_Position, Emp_PartyCommittee
 from datetime import datetime
 from django.core.exceptions import ValidationError
 
@@ -72,6 +72,7 @@ class EmpTitleForm(forms.ModelForm):
 class EmpImportForm(forms.Form):
     excel_file = forms.FileField() 
 
+
 #form thêm mới quy hoạch cho cán bộ
 class EmpPositionForm(forms.ModelForm):
     class Meta:
@@ -99,3 +100,63 @@ class EmpPositionForm(forms.ModelForm):
         if date_stop_position and date_stop_position > date_position:
             raise forms.ValidationError("Ngày hết hiệu lực quyết định không thể lớn hơn ngày quyết định.")
         return date_stop_position
+    
+
+#form thêm mới thông tin đảng ủy cho cán bộ
+class EmpPartyCommittee(forms.ModelForm):
+    class Meta:
+        model = Emp_PartyCommittee
+        fields = ['party_committee','from_date','to_date','file']
+        widgets = {
+            'party_committee': forms.Select(),
+            'from_date': forms.DateInput(attrs={'type': 'date'}),
+            'to_date': forms.DateInput(attrs={'type': 'date'}),
+        }
+    def clean_from_date(self):
+        from_date = self.cleaned_data.get('from_date')
+        if from_date and from_date > datetime.now().date():
+            raise forms.ValidationError("Ngày bắt đầu không thể lớn hơn ngày hiện tại.")
+        return from_date
+    def clean_to_date(self):
+        to_date = self.cleaned_data.get('to_date')
+        if to_date and to_date > datetime.now().date():
+            raise forms.ValidationError("Ngày kết thúc không thể lớn hơn ngày hiện tại.")
+        return to_date
+    def clean(self):
+        cleaned = super().clean()
+        to_date = self.cleaned_data.get('to_date')
+        from_date = self.cleaned_data.get('from_date')
+        if from_date and to_date and to_date < from_date:
+            raise forms.ValidationError("Ngày kết thúc không thể nhỏ hơn ngày bắt đầu.")
+        return cleaned
+    
+#form thêm mới thông tin đảng ủy cho cán bộ
+class EmpTraining(forms.ModelForm):
+    class Meta:
+        model = Emp_Training
+        fields = ['from_date','to_date','level','specialized','formality','level','training_school','equal_number','file']
+        widgets = {
+            'level': forms.Select(),
+            'formality': forms.Select(),
+            'specialized': forms.TextInput(attrs={'class': 'form-control'}),
+            'from_date': forms.DateInput(attrs={'type': 'date'}),
+            'to_date': forms.DateInput(attrs={'type': 'date'}),
+        }
+    def clean_from_date(self):
+        from_date = self.cleaned_data.get('from_date')
+        if from_date and from_date > datetime.now().date():
+            raise forms.ValidationError("Ngày bắt đầu không thể lớn hơn ngày hiện tại.")
+        return from_date
+    def clean_to_date(self):
+        to_date = self.cleaned_data.get('to_date')
+        if to_date and to_date > datetime.now().date():
+            raise forms.ValidationError("Ngày kết thúc không thể lớn hơn ngày hiện tại.")
+        return to_date
+    def clean(self):
+        cleaned = super().clean()
+        to_date = self.cleaned_data.get('to_date')
+        from_date = self.cleaned_data.get('from_date')
+        if from_date and to_date and to_date < from_date:
+            raise forms.ValidationError("Ngày kết thúc không thể nhỏ hơn ngày bắt đầu.")
+        return cleaned
+    

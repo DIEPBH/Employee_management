@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, JsonResponse
-from employee.form import EmpInformationForm, EmpTitleForm, EmpPositionForm
-from .models import Emp_information, Emp_Title, Emp_Position
+from employee.form import EmpInformationForm, EmpTitleForm, EmpPositionForm, EmpPartyCommittee, EmpTraining
+from .models import Emp_Training, Emp_information, Emp_Title, Emp_Position, Emp_PartyCommittee, Traning_level, committee, formality, Traning_level
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.views.decorators.http import require_POST
@@ -541,3 +541,339 @@ def emp_position_delete_(request, id):
     position.delete()
     messages.success(request, 'Bản ghi đã được xóa thành công.')
     return redirect('employee:index_emp_position')
+
+
+#################################################################
+############ Views quản lý thông tin cấp ủy đảng cán bộ##########
+#################################################################
+
+@login_required
+def index_emp_party_committee(request):
+    if request.user.is_authenticated:
+        # tham số tìm kiếm
+        emp_num = request.GET.get('emp_num', '')
+        full_name = request.GET.get('full_name', '')
+        party_committee = request.GET.get('party_committee', '').strip()
+        # lọc dữ liệu theo tham số tìm kiếm
+        emp_party_committee = Emp_PartyCommittee.objects.select_related('emp', 'party_committee').order_by('created_at')
+        committees = committee.objects.all()  # Lấy danh sách đảng ủy để hiển thị trong dropdown
+        if emp_num:
+            emp_party_committee = emp_party_committee.filter(emp__emp_num__icontains=emp_num)
+        if full_name:
+            emp_party_committee = emp_party_committee.filter(emp__full_name__icontains=full_name)
+        if party_committee:
+            emp_party_committee = emp_party_committee.filter(party_committee__id=party_committee)
+        
+        paginator = Paginator(emp_party_committee, 10)  # Hiển thị 10 dòng
+        page_number = request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+
+        # Giữ nguyên các tham số tìm kiếm khi phân trang
+        params = request.GET.copy() 
+        params.pop("page", None)  # bỏ page cũ
+        for k in list(params.keys()):
+            if not (params.get(k) or "").strip():
+                params.pop(k, None)
+        querystring = urlencode(params)
+
+        return render(request, 'partycommittee/index_emp_partycommittee.html', {'page_obj': page_obj, 'page_obj': page_obj, 'paginator': paginator, 'querystring': querystring, 'committees': committees})
+
+#Modal thêm thông tin đảng ủy cán bộ   
+@login_required
+def party_committee_manager_modal(request):
+    html = render_to_string("partycommittee/partycommittee_manager_modal.html", {}, request=request)
+    return JsonResponse({"success": True, "html": html})
+
+#submit form thêm thông tin đảng ủy cho cán bộ
+@login_required
+def emp_party_committee_form(request):
+    emp_num = request.GET.get("emp_num") or request.POST.get("emp_num")
+    if not emp_num:
+        return JsonResponse({"success": False, "html": "<div class='alert alert-danger'>Thiếu mã cán bộ</div>"})
+    try:
+        emp  = Emp_information.objects.get(emp_num=emp_num)
+    except Emp_information.DoesNotExist:
+        return JsonResponse({"success": False, "html": "<div class='alert alert-danger'>Cán bộ không tồn tại</div>"})
+    
+    if request.method == "POST":
+        form = EmpPartyCommittee(request.POST, request.FILES)
+        form.instance.emp = emp
+        if form.is_valid():
+            obj = form.save(commit=False)
+            obj.created_by = request.user
+            obj.created_at = datetime.now()
+            obj.emp = emp
+            obj.save()
+            return JsonResponse({"success": True})
+
+        html = render_to_string("partycommittee/partycommittee_form.html", {"form": form, 
+                                                          "emp_num": emp_num, 
+                                                          "post_url": reverse("employee:emp_party_committee_form"), "mode": "add"}, request=request)
+        return JsonResponse({"success": False, "html": html, "errors": form.errors})
+
+    form = EmpPartyCommittee(initial={"emp_num": emp_num})
+    html = render_to_string("partycommittee/partycommittee_form.html", {"form": form, "emp_num": emp_num,
+                                                       "post_url": reverse("employee:emp_party_committee_form"), "mode": "add"}, request=request)
+    return JsonResponse({"success": True, "html": html})
+
+# API bảng thông tin đảng ủy của cán bộ
+@login_required
+def employee_party_committee_table(request, emp_num):
+    qs = (
+    Emp_PartyCommittee.objects
+    .select_related("party_committee")
+    .filter(emp=emp_num)
+    .order_by("-created_at")
+    )
+
+    paginator = Paginator(qs, 10) # <-- đổi 10 dòng/trang 
+    raw_page = request.GET.get("page", "1")
+    try:
+        page_number = int(raw_page)
+    except (TypeError, ValueError):
+        page_number = 1
+
+
+    if page_number < 1:
+        page_number = 1
+
+    page_obj = paginator.get_page(page_number)
+
+    html = render_to_string("partycommittee/partycommittee_table.html",{"page_obj": page_obj, "emp_num": emp_num},request=request,)
+    return JsonResponse({"success": True, "html": html})
+
+# Sửa quy hoạch chức danh của cán bộ
+@login_required #modal
+def emp_party_committee_edit_modal(request, id):
+    committee = get_object_or_404(Emp_PartyCommittee, id=id)
+    if request.method == "POST":
+        form = EmpPartyCommittee(request.POST, request.FILES, instance=committee)
+        if form.is_valid():
+            form.save()
+            return JsonResponse({"success": True})
+
+        html = render_to_string(
+            "partycommittee/partycommittee_form.html",
+            {"form": form,
+             "post_url": reverse("employee:emp_party_committee_edit_modal", args=[committee.id])},
+            request=request
+        )
+        return JsonResponse({"success": False, "html": html})
+    # GET
+    form = EmpPartyCommittee(instance=committee)
+    html = render_to_string(
+        "partycommittee/partycommittee_form.html",
+        {"form": form,
+         "post_url": reverse("employee:emp_party_committee_edit_modal", args=[committee.id])},
+        request=request
+    )
+    return JsonResponse({"success": True, "html": html})
+
+#Xem quy hoạch chức danh của cán bộ:
+@login_required
+def emp_party_committee_view_modal(request, id):
+    committee = get_object_or_404(Emp_PartyCommittee, id=id)
+
+    form = EmpPartyCommittee(instance=committee)
+    for field in form.fields.values():
+        field.disabled = True
+    html = render_to_string(
+    "partycommittee/partycommittee_form.html",
+    {
+    "form": form,
+    "mode": "view", 
+    },
+    request=request
+    )
+    return JsonResponse({"success": True, "html": html})
+
+# Xóa bản ghi quy hoạch chức danh:
+@login_required
+def emp_party_committee_delete(request, id):
+    if request.method != "POST":
+        return JsonResponse({"success": False, "message": "Method not allowed"}, status=405)
+
+    committee = get_object_or_404(Emp_PartyCommittee, id=id)
+    committee.delete()
+    messages.success(request, 'Bản ghi đã được xóa thành công.')
+    return JsonResponse({"success": True})
+
+@login_required #Xóa trên màn search
+def emp_party_committee_delete_(request, id):
+    if request.method != "POST":
+        return JsonResponse({"success": False, "message": "Method not allowed"}, status=405)
+
+    committee = get_object_or_404(Emp_PartyCommittee, id=id)
+    committee.delete()
+    messages.success(request, 'Bản ghi đã được xóa thành công.')
+    return redirect('employee:index_emp_party_committee')
+
+
+#############################################################
+############ Views quản lý thông tin đào tạo cán bộ##########
+#############################################################
+
+@login_required
+def index_emp_training(request):
+    if request.user.is_authenticated:
+        # tham số tìm kiếm
+        emp_num = request.GET.get('emp_num', '')
+        full_name = request.GET.get('full_name', '')
+        formalitys = request.GET.get('formality', '').strip()
+        level = request.GET.get('level', '').strip()
+        # lọc dữ liệu theo tham số tìm kiếm
+        emp_training = Emp_Training.objects.select_related('emp', 'formality', 'level').order_by('created_at')
+        formality_list = formality.objects.all()  # Lấy danh sách hình thức đào tạo để hiển thị trong dropdown
+        level_list = Traning_level.objects.all()  # Lấy danh sách cấp độ đào tạo để hiển thị trong dropdown
+        if emp_num:
+            emp_training = emp_training.filter(emp__emp_num__icontains=emp_num)
+        if full_name:
+            emp_training = emp_training.filter(emp__full_name__icontains=full_name)
+        if formalitys:
+            emp_training = emp_training.filter(formality__id=formalitys)
+        if level:
+            emp_training = emp_training.filter(level__id=level)
+        
+        paginator = Paginator(emp_training, 10)  # Hiển thị 10 dòng
+        page_number = request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+
+        # Giữ nguyên các tham số tìm kiếm khi phân trang
+        params = request.GET.copy() 
+        params.pop("page", None)  # bỏ page cũ
+        for k in list(params.keys()):
+            if not (params.get(k) or "").strip():
+                params.pop(k, None)
+        querystring = urlencode(params)
+
+        return render(request, 'training/index_emp_training.html', {'emp_training': emp_training, 'page_obj': page_obj, 'paginator': paginator, 'querystring': querystring, 'formality_list': formality_list, 'level_list': level_list})
+
+#Modal thêm thông tin đảng ủy cán bộ   
+@login_required
+def training_manager_modal(request):
+    html = render_to_string("training/training_manager_modal.html", {}, request=request)
+    return JsonResponse({"success": True, "html": html})
+
+#submit form thêm thông tin đảng ủy cho cán bộ
+@login_required
+def emp_training_form(request):
+    emp_num = request.GET.get("emp_num") or request.POST.get("emp_num")
+    if not emp_num:
+        return JsonResponse({"success": False, "html": "<div class='alert alert-danger'>Thiếu mã cán bộ</div>"})
+    try:
+        emp  = Emp_information.objects.get(emp_num=emp_num)
+    except Emp_information.DoesNotExist:
+        return JsonResponse({"success": False, "html": "<div class='alert alert-danger'>Cán bộ không tồn tại</div>"})
+    
+    if request.method == "POST":
+        form = EmpTraining(request.POST, request.FILES)
+        form.instance.emp = emp
+        if form.is_valid():
+            obj = form.save(commit=False)
+            obj.created_by = request.user
+            obj.created_at = datetime.now()
+            obj.emp = emp
+            obj.save()
+            return JsonResponse({"success": True})
+
+        html = render_to_string("training/training_form.html", {"form": form, 
+                                                          "emp_num": emp_num, 
+                                                          "post_url": reverse("employee:emp_training_form"), "mode": "add"}, request=request)
+        return JsonResponse({"success": False, "html": html, "errors": form.errors})
+
+    form = EmpTraining(initial={"emp_num": emp_num})
+    html = render_to_string("training/training_form.html", {"form": form, "emp_num": emp_num,
+                                                       "post_url": reverse("employee:emp_training_form"), "mode": "add"}, request=request)
+    return JsonResponse({"success": True, "html": html})
+
+# API bảng thông tin đảng ủy của cán bộ
+@login_required
+def employee_training_table(request, emp_num):
+    qs = (
+    Emp_Training.objects
+    .select_related("level")
+    .filter(emp=emp_num)
+    .order_by("-created_at")
+    )
+
+    paginator = Paginator(qs, 10) # <-- đổi 10 dòng/trang 
+    raw_page = request.GET.get("page", "1")
+    try:
+        page_number = int(raw_page)
+    except (TypeError, ValueError):
+        page_number = 1
+
+
+    if page_number < 1:
+        page_number = 1
+
+    page_obj = paginator.get_page(page_number)
+
+    html = render_to_string("training/training_table.html",{"page_obj": page_obj, "emp_num": emp_num},request=request,)
+    return JsonResponse({"success": True, "html": html})
+
+# Sửa quy hoạch chức danh của cán bộ
+@login_required #modal
+def emp_training_edit_modal(request, id):
+    committee = get_object_or_404(Emp_Training, id=id)
+    if request.method == "POST":
+        form = EmpTraining(request.POST, request.FILES, instance=committee)
+        if form.is_valid():
+            form.save()
+            return JsonResponse({"success": True})
+
+        html = render_to_string(
+            "training/training_form.html",
+            {"form": form,
+             "post_url": reverse("employee:emp_training_edit_modal", args=[committee.id])},
+            request=request
+        )
+        return JsonResponse({"success": False, "html": html})
+    # GET
+    form = EmpTraining(instance=committee)
+    html = render_to_string(
+        "training/training_form.html",
+        {"form": form,
+         "post_url": reverse("employee:emp_training_edit_modal", args=[committee.id])},
+        request=request
+    )
+    return JsonResponse({"success": True, "html": html})
+
+#Xem quy hoạch chức danh của cán bộ:
+@login_required
+def emp_training_view_modal(request, id):
+    committee = get_object_or_404(Emp_Training, id=id)
+
+    form = EmpTraining(instance=committee)
+    for field in form.fields.values():
+        field.disabled = True
+    html = render_to_string(
+    "training/training_form.html",
+    {
+    "form": form,
+    "mode": "view", 
+    },
+    request=request
+    )
+    return JsonResponse({"success": True, "html": html})
+
+# Xóa bản ghi quy hoạch chức danh:
+@login_required
+def emp_training_delete(request, id):
+    if request.method != "POST":
+        return JsonResponse({"success": False, "message": "Method not allowed"}, status=405)
+
+    committee = get_object_or_404(Emp_Training, id=id)
+    committee.delete()
+    messages.success(request, 'Bản ghi đã được xóa thành công.')
+    return JsonResponse({"success": True})
+
+@login_required #Xóa trên màn search
+def emp_training_delete_(request, id):
+    if request.method != "POST":
+        return JsonResponse({"success": False, "message": "Method not allowed"}, status=405)
+
+    committee = get_object_or_404(Emp_Training, id=id)
+    committee.delete()
+    messages.success(request, 'Bản ghi đã được xóa thành công.')
+    return redirect('employee:index_emp_training')

@@ -1,8 +1,11 @@
 from django.contrib import admin
-from .models import Emp_information, company,Emp_Title,position
+from .models import Emp_information, company,Emp_Title,position, committee, Emp_Training, formality, Traning_level
 # Register your models here.
 
 admin.site.register(Emp_information)
 admin.site.register(company)
 admin.site.register(Emp_Title)
 admin.site.register(position)
+admin.site.register(committee)
+admin.site.register(formality)
+admin.site.register(Traning_level)

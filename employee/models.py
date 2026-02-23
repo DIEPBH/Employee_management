@@ -25,6 +25,27 @@ class company(models.Model): #Đơn vị
     def __str__(self):
         return self.name
 
+class Traning_level(models.Model): #Cấp đào tạo
+    id = models.AutoField(primary_key=True)
+    name = models.CharField("Cấp đào tạo",max_length=100, unique=True, null=False)
+
+    def __str__(self):
+        return self.name
+
+class formality(models.Model): #Hình thức đào tạo
+    id = models.AutoField(primary_key=True)
+    name = models.CharField("Hình thức đào tạo",max_length=100, unique=True, null=False)
+
+    def __str__(self):
+        return self.name
+
+class committee(models.Model): #Ủy ban
+    id = models.AutoField(primary_key=True)
+    name = models.CharField("Đảng ủy",max_length=100, unique=True, null=False)
+
+    def __str__(self):
+        return self.name
+
 class team(models.Model): #Đội công tác
     id = models.AutoField(primary_key=True)
     name = models.CharField("Đội công tác",max_length=100, unique=True, null=False)
@@ -237,18 +258,18 @@ class Emp_Position(models.Model):
         return self.position
         
     #Xóa file khi xóa bản ghi chức vụ
-    @receiver(post_delete, sender='employee.Emp_Title')
+    @receiver(post_delete, sender='employee.Emp_Position')
     def delete_file(sender, *args, instance, **kwargs):
         if instance.file and os.path.isfile(instance.file.path):
             os.remove(instance.file.path)
     #Xóa file khi thay đổi file mới
-    @receiver(pre_save, sender='employee.Emp_Title')
+    @receiver(pre_save, sender='employee.Emp_Position')
     def pre_save_file(sender, instance, **kwargs):
-        if not instance.pk:
+        if not instance.id:
             return False
         try:
-            old_file = Emp_Title.objects.get(pk=instance.pk).file
-        except Emp_Title.DoesNotExist:
+            old_file = Emp_Position.objects.get(id=instance.id).file
+        except Emp_Position.DoesNotExist:
             return False
         new_file = instance.file
         if not old_file == new_file:
@@ -262,9 +283,60 @@ class Emp_Position(models.Model):
 class Emp_PartyCommittee(models.Model):
     id = models.AutoField(primary_key=True)
     emp = models.ForeignKey(Emp_information,to_field='emp_num',db_column='emp_num', on_delete=models.CASCADE, verbose_name="Nhân viên", default='')
-    party_committee = models.CharField("Đảng ủy",max_length=100, unique=True, null=False)
+    party_committee = models.ForeignKey(committee, on_delete=models.CASCADE, verbose_name="Cấp ủy Đảng", default='')
     from_date = models.DateField("Từ ngày",null=False)
     to_date = models.DateField("Đến ngày",null=False)
+    file = models.FileField("File đính kèm",upload_to='employee_PartyCommittee/', null=True, blank=True)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, verbose_name="Người tạo", related_name="emp_PartyCommittee_created",)
+    created_at = models.DateTimeField("Ngày tạo", auto_now_add=True)
+    update_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, verbose_name="Người sửa", related_name="emp_PartyCommittee_updated",)
+    update_at = models.DateTimeField("Ngày sửa", auto_now_add=False,null=True)
+
+    # kiểm soát không overlap chức danh cho cùng 1 nhân viên
+    def clean(self):
+        super().clean()
+        start = self.from_date
+        end = self.to_date
+
+        if not self.emp or not start:
+            return
+        
+        if end and end < start:
+            raise ValidationError("Ngày dừng quyết định >= ngày quyết định")
+        qs = Emp_PartyCommittee.objects.filter(emp=self.emp).exclude(id=self.id)
+
+        # Overlap condition:
+        # [start, end] giao nhau với [a, b]
+        # end null => b = +inf
+        if end:
+            qs = qs.filter(
+                Q(to_date__isnull=True, from_date__lte=end) |
+                Q(to_date__isnull=False, from_date__lte=end, to_date__gte=start)
+            )
+        else:
+            qs = qs.filter(Q(to_date__isnull=True) | Q(to_date__gte=start))
+        if qs.exists():
+            raise ValidationError("Khoảng thời gian chức danh bị chồng lấn với bản ghi khác.")
+        
+        
+    #Xóa file khi xóa bản ghi chức vụ
+    @receiver(post_delete, sender='employee.Emp_PartyCommittee')
+    def delete_file(sender, *args, instance, **kwargs):
+        if instance.file and os.path.isfile(instance.file.path):
+            os.remove(instance.file.path)
+    #Xóa file khi thay đổi file mới
+    @receiver(pre_save, sender='employee.Emp_PartyCommittee')
+    def pre_save_file(sender, instance, **kwargs):
+        if not instance.id:
+            return False
+        try:
+            old_file = Emp_PartyCommittee.objects.get(id=instance.id).file
+        except Emp_PartyCommittee.DoesNotExist:
+            return False
+        new_file = instance.file
+        if not old_file == new_file:
+            if old_file and os.path.isfile(old_file.path):
+                os.remove(old_file.path)
 
     def __str__(self):
         return self.party_committee
@@ -274,12 +346,63 @@ class Emp_Training(models.Model):
     id = models.AutoField(primary_key=True)
     emp = models.ForeignKey(Emp_information,to_field='emp_num',db_column='emp_num', on_delete=models.CASCADE, verbose_name="Nhân viên", default='')
     from_date = models.DateField("Từ ngày",null=False)
-    to_date = models.DateField("Đến ngày",null=False)
+    to_date = models.DateField("Đến ngày",null=True, blank=True)
     specialized = models.CharField("Chuyên môn",max_length=100, null=False)
-    formality = models.CharField("Hình thức đào tạo",max_length=100, null=False)
-    level = models.CharField("Trình độ",max_length=100, null=False)
+    formality = models.ForeignKey(formality, on_delete=models.SET_NULL, null=True, verbose_name="Hình thức đào tạo")
+    level = models.ForeignKey(Traning_level, on_delete=models.SET_NULL, null=True, verbose_name="Trình độ")
     training_school = models.CharField("Trường đào tạo",max_length=100, null=False)
     equal_number = models.CharField("Số bằng",max_length=100, null=False)
+    file = models.FileField("File đính kèm",upload_to='employee_Training/', null=True, blank=True)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, verbose_name="Người tạo", related_name="emp_Training_created",)
+    created_at = models.DateTimeField("Ngày tạo", auto_now_add=True)
+    update_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, verbose_name="Người sửa", related_name="emp_Training_updated",)
+    update_at = models.DateTimeField("Ngày sửa", auto_now_add=False,null=True)
+
+    # kiểm soát không overlap chức danh cho cùng 1 nhân viên
+    def clean(self):
+        super().clean()
+        start = self.from_date
+        end = self.to_date
+
+        if not self.emp or not start:
+            return
+        
+        if end and end < start:
+            raise ValidationError("Ngày dừng quyết định >= ngày quyết định")
+        qs = Emp_Training.objects.filter(emp=self.emp).exclude(id=self.id)
+
+        # Overlap condition:
+        # [start, end] giao nhau với [a, b]
+        # end null => b = +inf
+        if end:
+            qs = qs.filter(
+                Q(to_date__isnull=True, from_date__lte=end) |
+                Q(to_date__isnull=False, from_date__lte=end, to_date__gte=start)
+            )
+        else:
+            qs = qs.filter(Q(to_date__isnull=True) | Q(to_date__gte=start))
+        if qs.exists():
+            raise ValidationError("Khoảng thời gian chức danh bị chồng lấn với bản ghi khác.")
+        
+        
+    #Xóa file khi xóa bản ghi chức vụ
+    @receiver(post_delete, sender='employee.Emp_Training')
+    def delete_file(sender, *args, instance, **kwargs):
+        if instance.file and os.path.isfile(instance.file.path):
+            os.remove(instance.file.path)
+    #Xóa file khi thay đổi file mới
+    @receiver(pre_save, sender='employee.Emp_Training')
+    def pre_save_file(sender, instance, **kwargs):
+        if not instance.id:
+            return False
+        try:
+            old_file = Emp_Training.objects.get(id=instance.id).file
+        except Emp_Training.DoesNotExist:
+            return False
+        new_file = instance.file
+        if not old_file == new_file:
+            if old_file and os.path.isfile(old_file.path):
+                os.remove(old_file.path)
 
     def __str__(self):
         return self.specialized

@@ -1,0 +1,100 @@
+<div class="sub-table">
+
+  <!-- Header info -->
+  <div class="sub-table__meta">
+    <div class="sub-table__count">
+      Tổng: <strong>{{ page_obj.paginator.count }}</strong> bản ghi
+    </div>
+    <div class="sub-table__page">
+      Trang <strong>{{ page_obj.number }}</strong> / {{ page_obj.paginator.num_pages }}
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="sub-table__wrap">
+    <table class="table table-sm table-hover align-middle">
+      <thead>
+        <tr>
+          <th class="st-id">ID</th>
+          <th class="st-title text-center" >Đảng ủy</th>
+          <th class="st-date">Từ ngày</th>
+          <th class="st-date">Đến ngày</th>
+          <th class="st-actions">Thao tác</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {% for r in page_obj.object_list %}
+        <tr>
+          <td class="st-id text-muted ">{{ r.id }}</td>
+
+          <td>
+            <div class="st-title text-center ">{{ r.party_committee }}</div>
+          </td>
+
+          <td class="st-date">{% if r.from_date %}{{ r.from_date|date:"d/m/Y" }}{% else %}—{% endif %}</td>
+          <td class="st-date">{% if r.to_date %}{{ r.to_date|date:"d/m/Y" }}{% else %}—{% endif %}</td>
+          <td class="st-actions">
+            <button class="btn btn-outline-info btn-sm"
+              data-open-child data-url="{% url 'employee:emp_party_committee_view_modal' r.id %}" 
+              data-title="Xem đảng ủy" 
+              data-type="emp_partycommittee_form">
+              Xem
+            </button>
+            <button class="btn btn-outline-primary btn-sm"
+              data-open-child 
+              data-url="{% url 'employee:emp_party_committee_edit_modal' r.id %}" 
+              data-title="Sửa thông tin đảng ủy" 
+              data-type="emp_partycommittee_form">
+              Sửa
+            </button>
+            
+            <button class="btn btn-outline-danger btn-sm js-delete-partycommittee"
+              data-delete-title data-url="{% url 'employee:emp_party_committee_delete' r.id %}">
+              Xóa
+            </button>
+
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="10" class="st-empty">
+            Chưa có chức vụ. Bấm <strong>“Thêm chức vụ”</strong> để tạo mới.
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  {% if page_obj.paginator.num_pages > 1 %}
+  <div class="sub-table__pager">
+    <div class="st-range">
+      {{ page_obj.start_index }}–{{ page_obj.end_index }} / {{ page_obj.paginator.count }}
+    </div>
+
+    <ul class="pagination pagination-sm mb-0">
+      <li class="page-item {% if not page_obj.has_previous %}disabled{% endif %}">
+        <a class="page-link js-partycommittee-page" href="#"
+           data-page="{% if page_obj.has_previous %}{{ page_obj.previous_page_number }}{% else %}1{% endif %}">‹</a>
+      </li>
+
+      {% for n in page_obj.paginator.page_range %}
+        {% if n == page_obj.number %}
+          <li class="page-item active"><span class="page-link">{{ n }}</span></li>
+        {% elif n >= page_obj.number|add:"-2" and n <= page_obj.number|add:"2" %}
+          <li class="page-item">
+            <a class="page-link js-partycommittee-page" href="#" data-page="{{ n }}">{{ n }}</a>
+          </li>
+        {% endif %}
+      {% endfor %}
+
+      <li class="page-item {% if not page_obj.has_next %}disabled{% endif %}">
+        <a class="page-link js-partycommittee-page" href="#"
+           data-page="{% if page_obj.has_next %}{{ page_obj.next_page_number }}{% else %}{{ page_obj.paginator.num_pages }}{% endif %}">›</a>
+      </li>
+    </ul>
+  </div>
+  {% endif %}
+</div>

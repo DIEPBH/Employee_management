@@ -34,4 +34,24 @@ urlpatterns = [
     path("positions/<int:id>/view/", views.emp_position_view_modal, name="emp_position_view_modal"), 
     path("positions/<int:id>/delete/", views.emp_position_delete, name="emp_position_delete"),
     path("positions/<int:id>/delete_/", views.emp_position_delete_, name="emp_position_delete_"), #Xóa trên search
+
+    #Thông tin đảng ủy cán bộ
+    path('party_committee/', views.index_emp_party_committee, name = 'index_emp_party_committee'),
+    path("api/employee/<str:emp_num>/party_committee/", views.employee_party_committee_table, name="employee_party_committee_table"),
+    path("party_committee/add/", views.emp_party_committee_form, name="emp_party_committee_form"),
+    path('add_party_committee/', views.party_committee_manager_modal, name='party_committee_manager_modal'),
+    path("party_committee/<int:id>/edit/", views.emp_party_committee_edit_modal, name="emp_party_committee_edit_modal"),#Sửa trên Modal
+    path("party_committee/<int:id>/view/", views.emp_party_committee_view_modal, name="emp_party_committee_view_modal"), 
+    path("party_committee/<int:id>/delete/", views.emp_party_committee_delete, name="emp_party_committee_delete"),
+    path("party_committee/<int:id>/delete_/", views.emp_party_committee_delete_, name="emp_party_committee_delete_"), #Xóa trên search
+
+    #Thông tin đào tạo cán bộ
+    path('training/', views.index_emp_training, name = 'index_emp_training'),
+    path("api/employee/<str:emp_num>/training/", views.employee_training_table, name="employee_training_table"),
+    path("training/add/", views.emp_training_form, name="emp_training_form"),
+    path('add_training/', views.training_manager_modal, name='training_manager_modal'),
+    path("training/<int:id>/edit/", views.emp_training_edit_modal, name="emp_training_edit_modal"),#Sửa trên Modal
+    path("training/<int:id>/view/", views.emp_training_view_modal, name="emp_training_view_modal"), 
+    path("training/<int:id>/delete/", views.emp_training_delete, name="emp_training_delete"),
+    path("training/<int:id>/delete_/", views.emp_training_delete_, name="emp_training_delete_"), #Xóa trên search
 ]
