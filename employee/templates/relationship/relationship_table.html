@@ -16,13 +16,12 @@
       <thead>
         <tr>
           <th class="st-id">ID</th>
-          <th class="st-date">Từ ngày</th>
-          <th class="st-date">Đến ngày</th>
-          <th class="st-center">Chuyên môn</th>
-          <th class="st-center">Hình thức đào tạo</th>
-          <th class="st-center">Trình độ</th>
-          <th class="st-date">Trường đào tạo</th>
-          <th class="st-center">Số bằng</th>
+          <th class="st-center">Loại quan hệ</th>
+          <th class="st-center">Họ và tên thân nhân</th>
+          <th class="st-date">Năm sinh</th>
+          <th class="st-center">Nghề nghiệp</th>
+          <th class="st-center">Chức vụ</th>
+          <th class="st-center">Địa chỉ</th>
           <th class="st-actions">Thao tác</th>
         </tr>
       </thead>
@@ -32,30 +31,30 @@
         <tr>
           <td class="st-id text-muted">{{ r.id }}</td>
 
-          <td class="st-date">{% if r.from_date %}{{ r.from_date|date:"d/m/Y" }}{% else %}—{% endif %}</td>
-          <td class="st-date">{% if r.to_date %}{{ r.to_date|date:"d/m/Y" }}{% else %}—{% endif %}</td>
-          <td class="st-center">{{ r.specialized|default:"—" }}</td>
-          <td class="st-center">{{ r.formality }}</td>
-          <td class="st-center">{{ r.level }}</td>
-          <td class="st-center">{{ r.training_school|default:"—" }}</td>
-          <td class="st-center">{{ r.equal_number|default:"—" }}</td>
+          <td class="st-center">{% if r.relationship_type %}{{ r.relationship_type.name }}{% else %}—{% endif %}</td>
+          <td class="st-center">{{ r.full_name|default:"—" }}</td>
+          <td class="st-date">{% if r.date_of_birth %}{{ r.date_of_birth }}{% else %}—{% endif %}</td>
+          <td class="st-center">{{ r.career|default:"—" }}</td>
+          <td class="st-center">{{ r.title|default:"—" }}</td>
+          <td class="st-center">{{ r.work_unit|default:"—" }}</td>
+          <td class="st-center">{{ r.address|default:"—" }}</td>
           <td class="st-actions">
             <button class="btn btn-outline-info btn-sm"
-              data-open-child data-url="{% url 'employee:emp_training_view_modal' r.id %}" 
-              data-title="Xem thông tin đào tạo" 
-              data-type="emp_training_form">
+              data-open-child data-url="{% url 'employee:emp_relationship_view_modal' r.id %}" 
+              data-title="Xem thông tin thân nhân" 
+              data-type="emp_relationship_form">
               Xem
             </button>
             <button class="btn btn-outline-primary btn-sm"
               data-open-child 
-              data-url="{% url 'employee:emp_training_edit_modal' r.id %}" 
-              data-title="Sửa thông tin đào tạo" 
-              data-type="emp_training_form">
+              data-url="{% url 'employee:emp_relationship_edit_modal' r.id %}" 
+              data-title="Sửa thông tin thân nhân" 
+              data-type="emp_relationship_form">
               Sửa
             </button>
             
-            <button class="btn btn-outline-danger btn-sm js-delete-training"
-              data-delete-title data-url="{% url 'employee:emp_training_delete' r.id %}">
+            <button class="btn btn-outline-danger btn-sm js-delete-relationship"
+              data-delete-title data-url="{% url 'employee:emp_relationship_delete' r.id %}">
               Xóa
             </button>
 
@@ -64,7 +63,7 @@
         {% empty %}
         <tr>
           <td colspan="10" class="st-empty">
-            Chưa có thông tin đào tạo. Bấm <strong>“Thêm thông tin đào tạo”</strong> để tạo mới.
+            Chưa có thông tin thân nhân. Bấm <strong>“Thêm thông tin thân nhân”</strong> để tạo mới.
           </td>
         </tr>
         {% endfor %}
@@ -81,7 +80,7 @@
 
     <ul class="pagination pagination-sm mb-0">
       <li class="page-item {% if not page_obj.has_previous %}disabled{% endif %}">
-        <a class="page-link js-training-page" href="#"
+        <a class="page-link js-relationship-page" href="#"
            data-page="{% if page_obj.has_previous %}{{ page_obj.previous_page_number }}{% else %}1{% endif %}">‹</a>
       </li>
 
@@ -90,13 +89,13 @@
           <li class="page-item active"><span class="page-link">{{ n }}</span></li>
         {% elif n >= page_obj.number|add:"-2" and n <= page_obj.number|add:"2" %}
           <li class="page-item">
-            <a class="page-link js-training-page" href="#" data-page="{{ n }}">{{ n }}</a>
+            <a class="page-link js-relationship-page" href="#" data-page="{{ n }}">{{ n }}</a>
           </li>
         {% endif %}
       {% endfor %}
 
       <li class="page-item {% if not page_obj.has_next %}disabled{% endif %}">
-        <a class="page-link js-training-page" href="#"
+        <a class="page-link js-relationship-page" href="#"
            data-page="{% if page_obj.has_next %}{{ page_obj.next_page_number }}{% else %}{{ page_obj.paginator.num_pages }}{% endif %}">›</a>
       </li>
     </ul>

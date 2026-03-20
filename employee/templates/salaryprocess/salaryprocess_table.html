@@ -16,13 +16,12 @@
       <thead>
         <tr>
           <th class="st-id">ID</th>
-          <th class="st-date">Từ ngày</th>
-          <th class="st-date">Đến ngày</th>
-          <th class="st-center">Chuyên môn</th>
-          <th class="st-center">Hình thức đào tạo</th>
-          <th class="st-center">Trình độ</th>
-          <th class="st-date">Trường đào tạo</th>
-          <th class="st-center">Số bằng</th>
+          <th class="st-center">Cấp bậc</th>
+          <th class="st-date">Ngày nhận cấp bậc</th>
+          <th class="st-center">Hệ số lương</th>
+          <th class="st-date">Ngày nhận hệ số lương</th>
+          <th class="st-center">Số quyết định</th>
+          <th class="st-date">Ngày quyết định</th>
           <th class="st-actions">Thao tác</th>
         </tr>
       </thead>
@@ -31,31 +30,29 @@
         {% for r in page_obj.object_list %}
         <tr>
           <td class="st-id text-muted">{{ r.id }}</td>
-
-          <td class="st-date">{% if r.from_date %}{{ r.from_date|date:"d/m/Y" }}{% else %}—{% endif %}</td>
-          <td class="st-date">{% if r.to_date %}{{ r.to_date|date:"d/m/Y" }}{% else %}—{% endif %}</td>
-          <td class="st-center">{{ r.specialized|default:"—" }}</td>
-          <td class="st-center">{{ r.formality }}</td>
-          <td class="st-center">{{ r.level }}</td>
-          <td class="st-center">{{ r.training_school|default:"—" }}</td>
-          <td class="st-center">{{ r.equal_number|default:"—" }}</td>
+          <td class="st-center">{{ r.level|default:"—" }}</td>
+          <td class="st-date">{% if r.date_issue %}{{ r.date_issue|date:"d/m/Y" }}{% else %}—{% endif %}</td>
+          <td class="st-center">{{ r.salary_coefficient|default:"—" }}</td>
+          <td class="st-date">{% if r.date_receive %}{{ r.date_receive|date:"d/m/Y" }}{% else %}—{% endif %}</td>
+          <td class="st-center">{{ r.decision_number|default:"—" }}</td>
+          <td class="st-date">{% if r.decision_date %}{{ r.decision_date|date:"d/m/Y" }}{% else %}—{% endif %}</td>
           <td class="st-actions">
             <button class="btn btn-outline-info btn-sm"
-              data-open-child data-url="{% url 'employee:emp_training_view_modal' r.id %}" 
-              data-title="Xem thông tin đào tạo" 
-              data-type="emp_training_form">
+              data-open-child data-url="{% url 'employee:emp_salaryprocess_view_modal' r.id %}" 
+              data-title="Xem thông tin quá trình lương" 
+              data-type="emp_salaryprocess_form">
               Xem
             </button>
             <button class="btn btn-outline-primary btn-sm"
               data-open-child 
-              data-url="{% url 'employee:emp_training_edit_modal' r.id %}" 
-              data-title="Sửa thông tin đào tạo" 
-              data-type="emp_training_form">
+              data-url="{% url 'employee:emp_salaryprocess_edit_modal' r.id %}" 
+              data-title="Sửa thông tin quá trình lương" 
+              data-type="emp_salaryprocess_form">
               Sửa
             </button>
             
-            <button class="btn btn-outline-danger btn-sm js-delete-training"
-              data-delete-title data-url="{% url 'employee:emp_training_delete' r.id %}">
+            <button class="btn btn-outline-danger btn-sm js-delete-salaryprocess"
+              data-delete-title data-url="{% url 'employee:emp_salaryprocess_delete' r.id %}">
               Xóa
             </button>
 
@@ -64,7 +61,7 @@
         {% empty %}
         <tr>
           <td colspan="10" class="st-empty">
-            Chưa có thông tin đào tạo. Bấm <strong>“Thêm thông tin đào tạo”</strong> để tạo mới.
+            Chưa có thông tin quá trình lương. Bấm <strong>“Thêm thông tin quá trình lương”</strong> để tạo mới.
           </td>
         </tr>
         {% endfor %}
@@ -81,7 +78,7 @@
 
     <ul class="pagination pagination-sm mb-0">
       <li class="page-item {% if not page_obj.has_previous %}disabled{% endif %}">
-        <a class="page-link js-training-page" href="#"
+        <a class="page-link js-salaryprocess-page" href="#"
            data-page="{% if page_obj.has_previous %}{{ page_obj.previous_page_number }}{% else %}1{% endif %}">‹</a>
       </li>
 
@@ -90,13 +87,13 @@
           <li class="page-item active"><span class="page-link">{{ n }}</span></li>
         {% elif n >= page_obj.number|add:"-2" and n <= page_obj.number|add:"2" %}
           <li class="page-item">
-            <a class="page-link js-training-page" href="#" data-page="{{ n }}">{{ n }}</a>
+            <a class="page-link js-salaryprocess-page" href="#" data-page="{{ n }}">{{ n }}</a>
           </li>
         {% endif %}
       {% endfor %}
 
       <li class="page-item {% if not page_obj.has_next %}disabled{% endif %}">
-        <a class="page-link js-training-page" href="#"
+        <a class="page-link js-salaryprocess-page" href="#"
            data-page="{% if page_obj.has_next %}{{ page_obj.next_page_number }}{% else %}{{ page_obj.paginator.num_pages }}{% endif %}">›</a>
       </li>
     </ul>

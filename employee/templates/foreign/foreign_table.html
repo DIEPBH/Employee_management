@@ -18,11 +18,8 @@
           <th class="st-id">ID</th>
           <th class="st-date">Từ ngày</th>
           <th class="st-date">Đến ngày</th>
-          <th class="st-center">Chuyên môn</th>
-          <th class="st-center">Hình thức đào tạo</th>
-          <th class="st-center">Trình độ</th>
-          <th class="st-date">Trường đào tạo</th>
-          <th class="st-center">Số bằng</th>
+          <th class="st-center">Quốc gia</th>
+          <th class="st-center">Lý do đến</th>
           <th class="st-actions">Thao tác</th>
         </tr>
       </thead>
@@ -31,31 +28,27 @@
         {% for r in page_obj.object_list %}
         <tr>
           <td class="st-id text-muted">{{ r.id }}</td>
-
-          <td class="st-date">{% if r.from_date %}{{ r.from_date|date:"d/m/Y" }}{% else %}—{% endif %}</td>
-          <td class="st-date">{% if r.to_date %}{{ r.to_date|date:"d/m/Y" }}{% else %}—{% endif %}</td>
-          <td class="st-center">{{ r.specialized|default:"—" }}</td>
-          <td class="st-center">{{ r.formality }}</td>
-          <td class="st-center">{{ r.level }}</td>
-          <td class="st-center">{{ r.training_school|default:"—" }}</td>
-          <td class="st-center">{{ r.equal_number|default:"—" }}</td>
+          <td class="st-date">{{ r.from_date|date:"d/m/Y"|default:"—" }}</td>
+          <td class="st-date">{{ r.to_date|date:"d/m/Y"|default:"—" }}</td>
+          <td class="st-center">{{ r.nation|default:"—" }}</td>
+          <td class="st-center">{{ r.reason|default:"—" }}</td>
           <td class="st-actions">
             <button class="btn btn-outline-info btn-sm"
-              data-open-child data-url="{% url 'employee:emp_training_view_modal' r.id %}" 
-              data-title="Xem thông tin đào tạo" 
-              data-type="emp_training_form">
+              data-open-child data-url="{% url 'employee:emp_foreign_view_modal' r.id %}" 
+              data-title="Xem thông tin người nước ngoài" 
+              data-type="emp_foreign_manage">
               Xem
             </button>
             <button class="btn btn-outline-primary btn-sm"
               data-open-child 
-              data-url="{% url 'employee:emp_training_edit_modal' r.id %}" 
-              data-title="Sửa thông tin đào tạo" 
-              data-type="emp_training_form">
+              data-url="{% url 'employee:emp_foreign_edit_modal' r.id %}" 
+              data-title="Sửa thông tin người nước ngoài" 
+              data-type="emp_foreign_manage">
               Sửa
             </button>
             
-            <button class="btn btn-outline-danger btn-sm js-delete-training"
-              data-delete-title data-url="{% url 'employee:emp_training_delete' r.id %}">
+            <button class="btn btn-outline-danger btn-sm js-delete-relationship"
+              data-delete-title data-url="{% url 'employee:emp_foreign_delete' r.id %}">
               Xóa
             </button>
 
@@ -64,7 +57,7 @@
         {% empty %}
         <tr>
           <td colspan="10" class="st-empty">
-            Chưa có thông tin đào tạo. Bấm <strong>“Thêm thông tin đào tạo”</strong> để tạo mới.
+            Chưa có thông tin người nước ngoài. Bấm <strong>“Thêm thông tin người nước ngoài”</strong> để tạo mới.
           </td>
         </tr>
         {% endfor %}
@@ -81,7 +74,7 @@
 
     <ul class="pagination pagination-sm mb-0">
       <li class="page-item {% if not page_obj.has_previous %}disabled{% endif %}">
-        <a class="page-link js-training-page" href="#"
+        <a class="page-link js-foreign-page" href="#"
            data-page="{% if page_obj.has_previous %}{{ page_obj.previous_page_number }}{% else %}1{% endif %}">‹</a>
       </li>
 
@@ -90,13 +83,13 @@
           <li class="page-item active"><span class="page-link">{{ n }}</span></li>
         {% elif n >= page_obj.number|add:"-2" and n <= page_obj.number|add:"2" %}
           <li class="page-item">
-            <a class="page-link js-training-page" href="#" data-page="{{ n }}">{{ n }}</a>
+            <a class="page-link js-foreign-page" href="#" data-page="{{ n }}">{{ n }}</a>
           </li>
         {% endif %}
       {% endfor %}
 
       <li class="page-item {% if not page_obj.has_next %}disabled{% endif %}">
-        <a class="page-link js-training-page" href="#"
+        <a class="page-link js-foreign-page" href="#"
            data-page="{% if page_obj.has_next %}{{ page_obj.next_page_number }}{% else %}{{ page_obj.paginator.num_pages }}{% endif %}">›</a>
       </li>
     </ul>

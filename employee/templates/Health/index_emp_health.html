@@ -2,7 +2,7 @@
 {% block content %}
     <div class="container-fluid page-header">
         <i class="fa-solid fa-users me-2"></i>
-        <h1>TRA CỨU THÔNG TIN QUÁ TRÌNH ĐÀO TẠO CÁN BỘ</h1>
+        <h1>TRA CỨU THÔNG TIN SỨC KHỎE CÁN BỘ</h1>
     </div>
     <!-- Khu vực tìm kiếm -->
         <div class="container-fluid mt-3 px-0" id="search-panel-wrapper">
@@ -28,23 +28,9 @@
                         </div>
 
                         <div class="search-item">
-                            <label class="search-label">Hình thức đào tạo</label>
-                            <select name="formality" id="formality-select" class="search-control">
-                                <option value="">Chọn hình thức đào tạo</option>
-                                {% for f in formality_list %}
-                                    <option value="{{ f.id }}" {% if request.GET.formality == f.id|stringformat:"s" %}selected{% endif %}>{{ f.name }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-
-                        <div class="search-item">
-                            <label class="search-label">Trình độ</label>
-                            <select name="level" id="level-select" class="search-control">
-                                <option value="">Chọn trình độ</option>
-                                {% for l in level_list %}
-                                    <option value="{{ l.id }}" {% if request.GET.level == l.id|stringformat:"s" %}selected{% endif %}>{{ l.name }}</option>
-                                {% endfor %}
-                            </select>
+                            <label class="search-label">Ngày kiểm tra sức khỏe</label>
+                            <input type="date" name="datecheck" class="search-control"
+                                value="{{ request.GET.datecheck|default:'' }}">
                         </div>
                     </div>
 
@@ -52,7 +38,7 @@
                     <button type="submit" class="btn btn-primary">Tìm kiếm</button>
 
                     <!-- Nút reset: quay về trang index không có query -->
-                    <a href="{% url 'employee:index_emp_training' %}" class="btn btn-outline-secondary">Xóa lọc</a>
+                    <a href="{% url 'employee:index_emp_health' %}" class="btn btn-outline-secondary">Xóa lọc</a>
                     </div>
                 </form>
             </div>
@@ -62,9 +48,9 @@
     <div class="d-flex justify-content-end align-items-center mt-3">
         <button
             class="btn btn-success js-open-modal"
-            data-modal-url="{% url 'employee:training_manager_modal' %}"
-            data-modal-title="Thêm mới thông tin đào tạo"
-            data-modal-type="emp_training_manage">
+            data-modal-url="{% url 'employee:health_manager_modal' %}"
+            data-modal-title="Thêm mới thông tin sức khỏe cán bộ"
+            data-modal-type="emp_health_manage">
             <i class="fa-solid fa-plus me-2"></i> Thêm mới
         </button>
     </div>
@@ -94,31 +80,19 @@
                                 <div class="col-resizer"></div>
                             </th>
                             <th>
-                                <span class="th-ellipsis">Từ ngày</span>
+                                <span class="th-ellipsis">Ngày kiểm tra sức khỏe</span>
                                 <div class="col-resizer"></div>
                             </th>
                             <th>
-                                <span class="th-ellipsis">Đến ngày</span>
+                                <span class="th-ellipsis">Tình trạng sức khỏe</span>
                                 <div class="col-resizer"></div>
                             </th>
                             <th>
-                                <span class="th-ellipsis">Chuyên môn</span>
+                                <span class="th-ellipsis">Thương binh</span>
                                 <div class="col-resizer"></div>
                             </th>
                             <th>
-                                <span class="th-ellipsis">Hình thức đào tạo</span>
-                                <div class="col-resizer"></div>
-                            </th>
-                            <th>
-                                <span class="th-ellipsis">Trình độ</span>
-                                <div class="col-resizer"></div>
-                            </th>
-                            <th>
-                                <span class="th-ellipsis">Trường đào tạo</span>
-                                <div class="col-resizer"></div>
-                            </th>
-                            <th>
-                                <span class="th-ellipsis">Số bằng</span>
+                                <span class="th-ellipsis">Đơn vị khám sức khỏe</span>
                                 <div class="col-resizer"></div>
                             </th>
                             <th>
@@ -140,28 +114,25 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for obj in emp_training %}
+                        {% for d in data %}
                         <tr>
-                            <td data-bs-toggle="tooltip" title="{{ obj.id }}">{{ obj.id }}</td>
-                            <td data-bs-toggle="tooltip" title="{{ obj.emp }}">{{ obj.emp.emp_num }}</td>
-                            <td class = "col-fullname">{{ obj.emp.full_name }}</td>
-                            <td data-bs-toggle="tooltip" title="{{ obj.from_date }}">{{ obj.from_date|date:"d/m/Y"|default_if_none:"" }}</td>
-                            <td data-bs-toggle="tooltip" title="{{ obj.to_date }}">{{ obj.to_date|date:"d/m/Y"|default_if_none:"" }}</td>
-                            <td data-bs-toggle="tooltip" title="{{ obj.specialized }}">{{ obj.specialized }}</td>
-                            <td data-bs-toggle="tooltip" title="{{ obj.formality }}">{{ obj.formality }}</td>
-                            <td data-bs-toggle="tooltip" title="{{ obj.level }}">{{ obj.level }}</td>
-                            <td data-bs-toggle="tooltip" title="{{ obj.training_school }}">{{ obj.training_school }}</td>
-                            <td data-bs-toggle="tooltip" title="{{ obj.equal_number }}">{{ obj.equal_number }}</td>
-                            <td data-bs-toggle="tooltip" title="{{ obj.created_by }}">{{ obj.created_by }}</td>
-                            <td data-bs-toggle="tooltip" title="{{ obj.created_at }}">{{ obj.created_at|date:"d/m/Y"|default_if_none:"" }}</td>
-                            <td data-bs-toggle="tooltip" title="{{ obj.update_by }}">{% if obj.update_by %}
-                                {{ obj.update_by }}
+                            <td data-bs-toggle="tooltip" title="{{ d.id }}">{{ d.id }}</td>
+                            <td data-bs-toggle="tooltip" title="{{ d.emp }}">{{ d.emp.emp_num }}</td>
+                            <td class = "col-fullname">{{ d.emp.full_name }}</td>
+                            <td data-bs-toggle="tooltip" title="{{ d.date_check }}">{{ d.date_check|date:"d/m/Y"|default_if_none:"" }}</td>
+                            <td data-bs-toggle="tooltip" title="{{ d.heal_check }}">{{ d.heal_check|default_if_none:"" }}</td>
+                            <td data-bs-toggle="tooltip" title="{{ d.wounded_soldiers }}">{{ d.wounded_soldiers|default_if_none:"" }}</td>
+                            <td data-bs-toggle="tooltip" title="{{ d.agency }}">{{ d.agency }}</td>
+                            <td data-bs-toggle="tooltip" title="{{ d.created_by }}">{{ d.created_by }}</td>
+                            <td data-bs-toggle="tooltip" title="{{ d.created_at }}">{{ d.created_at|date:"d/m/Y"|default_if_none:"" }}</td>
+                            <td data-bs-toggle="tooltip" title="{{ d.update_by }}">{% if d.update_by %}
+                                {{ d.update_by }}
                                 {%else%}
                                 -
                                 {%endif%}</td>
-                            <td data-bs-toggle="tooltip" title="{{ position.update_at }}">
-                                {% if position.update_at %}
-                                {{ position.update_at|date:"d/m/Y"|default_if_none:"" }}</td>
+                            <td data-bs-toggle="tooltip" title="{{ d.update_at }}">
+                                {% if d.update_at %}
+                                {{ d.update_at|date:"d/m/Y"|default_if_none:"" }}</td>
                                 {% else %}
                                     -
                                 {%endif%}</td>
@@ -181,19 +152,19 @@
                         </thead>
 
                         <tbody>
-                            {% for obj in emp_training %}
+                            {% for d in data %}
                             <tr>
                             <td>
                                 <button
                                     class="btn btn-sm btn-warning js-open-modal"
-                                    data-modal-url="{% url 'employee:emp_training_view_modal' obj.id %}"
-                                    data-modal-title="Xem thông tin đào tạo"
-                                    data-modal-type="emp_training_manage">
+                                    data-modal-url="{% url 'employee:emp_health_view_modal' d.id %}"
+                                    data-modal-title="Xem thông tin sức khỏe"
+                                    data-modal-type="emp_health_manage">
                                     <i class="fa-solid fa-eye"></i>
                                 </button>
                             </td>
                             <td>
-                                <form action="{% url 'employee:emp_training_delete' obj.id %}" method="post">
+                                <form action="{% url 'employee:emp_health_delete' d.id %}" method="post">
                                 {% csrf_token %}
                                 <button type="submit" class="btn btn-sm btn-danger"
                                         onclick="return confirm('Bạn có chắc chắn muốn xóa')" title="Xóa">

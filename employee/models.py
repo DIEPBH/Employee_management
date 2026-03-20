@@ -25,6 +25,27 @@ class company(models.Model): #Đơn vị
     def __str__(self):
         return self.name
 
+class relationship_type(models.Model): #Quan hệ gia đình
+    id = models.AutoField(primary_key=True)
+    name = models.CharField("Quan hệ gia đình",max_length=100, unique=True, null=False)
+
+    def __str__(self):
+        return self.name
+
+class award_level(models.Model): #Cấp khen thưởng
+    id = models.AutoField(primary_key=True)
+    name = models.CharField("Cấp khen thưởng",max_length=100, unique=True, null=False)
+
+    def __str__(self):
+        return self.name
+
+class award_type(models.Model): #Hình thức khen thưởng
+    id = models.AutoField(primary_key=True)
+    name = models.CharField("Hình thức khen thưởng",max_length=100, unique=True, null=False)
+
+    def __str__(self):
+        return self.name
+
 class Traning_level(models.Model): #Cấp đào tạo
     id = models.AutoField(primary_key=True)
     name = models.CharField("Cấp đào tạo",max_length=100, unique=True, null=False)
@@ -411,13 +432,37 @@ class Emp_Training(models.Model):
 class Emp_SalaryProcess(models.Model):
     id = models.AutoField(primary_key=True)
     emp = models.ForeignKey(Emp_information,to_field='emp_num',db_column='emp_num', on_delete=models.CASCADE, verbose_name="Nhân viên", default='')
-    level = models.CharField("Cấp bậc",max_length=50, null=False)
+    level = models.ForeignKey(level, on_delete=models.CASCADE, verbose_name="Cấp bậc", default='')
     date_issue = models.DateField("Ngày nhận cấp bậc",null=False)
     salary_coefficient = models.DecimalField("Hệ số lương", max_digits=10, decimal_places=2, null=False)
     date_receive = models.DateField("Ngày nhận hệ số lương",null=False)
     decision_number = models.CharField("Số quyết định",max_length=100, null=False)
     decision_date = models.DateField("Ngày quyết định",null=False)
-    decision_number = models.CharField("Số quyết định",max_length=100, null=False)
+    file = models.FileField("File đính kèm",upload_to='employee_SalaryProcess/', null=True, blank=True)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, verbose_name="Người tạo", related_name="emp_SalaryProcess_created",)
+    created_at = models.DateTimeField("Ngày tạo", auto_now_add=True)
+    update_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, verbose_name="Người sửa", related_name="emp_SalaryProcess_updated",)
+    update_at = models.DateTimeField("Ngày sửa", auto_now_add=False,null=True)
+
+
+    #Xóa file khi xóa bản ghi chức vụ
+    @receiver(post_delete, sender='employee.Emp_SalaryProcess')
+    def delete_file(sender, *args, instance, **kwargs):
+        if instance.file and os.path.isfile(instance.file.path):
+            os.remove(instance.file.path)
+    #Xóa file khi thay đổi file mới
+    @receiver(pre_save, sender='employee.Emp_SalaryProcess')
+    def pre_save_file(sender, instance, **kwargs):
+        if not instance.id:
+            return False
+        try:
+            old_file = Emp_SalaryProcess.objects.get(id=instance.id).file
+        except Emp_SalaryProcess.DoesNotExist:
+            return False
+        new_file = instance.file
+        if not old_file == new_file:
+            if old_file and os.path.isfile(old_file.path):
+                os.remove(old_file.path)
 
     def __str__(self):
         return self.level
@@ -427,23 +472,71 @@ class Emp_Awards(models.Model):
     id = models.AutoField(primary_key=True)
     emp = models.ForeignKey(Emp_information,to_field='emp_num',db_column='emp_num', on_delete=models.CASCADE, verbose_name="Nhân viên", default='')
     date_issue= models.DateField("Ngày nhận khen thưởng",null=False)
-    forms_of_reward = models.CharField("Hình thức khen thưởng",max_length=100, null=False)
-    award_level = models.CharField("Cấp khen thưởng",max_length=100, null=False)
+    award_type = models.ForeignKey(award_type, on_delete=models.CASCADE, verbose_name="Hình thức khen thưởng", default='')
+    award_level = models.ForeignKey(award_level, on_delete=models.CASCADE, verbose_name="Cấp khen thưởng", default='')
+    file = models.FileField("File đính kèm",upload_to='employee_Awards/', null=True, blank=True)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, verbose_name="Người tạo", related_name="emp_Awards_created",)
+    created_at = models.DateTimeField("Ngày tạo", auto_now_add=True)
+    update_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, verbose_name="Người sửa", related_name="emp_Awards_updated",)
+    update_at = models.DateTimeField("Ngày sửa", auto_now_add=False,null=True)
+
+     #Xóa file khi xóa bản ghi chức vụ
+    @receiver(post_delete, sender='employee.Emp_Awards')
+    def delete_file(sender, *args, instance, **kwargs):
+        if instance.file and os.path.isfile(instance.file.path):
+            os.remove(instance.file.path)
+    #Xóa file khi thay đổi file mới
+    @receiver(pre_save, sender='employee.Emp_Awards')
+    def pre_save_file(sender, instance, **kwargs):
+        if not instance.id:
+            return False
+        try:
+            old_file = Emp_Awards.objects.get(id=instance.id).file
+        except Emp_Awards.DoesNotExist:
+            return False
+        new_file = instance.file
+        if not old_file == new_file:
+            if old_file and os.path.isfile(old_file.path):
+                os.remove(old_file.path)
 
     def __str__(self):
-        return self.forms_of_reward
+        return self.reward_type.name + " - " + self.award_level.name
     
 #8 Bảng thông tin kỷ luật
 class Emp_Discipline(models.Model):
     id = models.AutoField(primary_key=True)
     emp = models.ForeignKey(Emp_information,to_field='emp_num',db_column='emp_num', on_delete=models.CASCADE, verbose_name="Nhân viên", default='')
-    discipline_party = models.CharField("Kỷ luật Đảng",max_length=100, null=False)
-    date_issue_party =  models.DateField("Ngày kỷ luật Đảng",null=False)
-    discipline_government =     models.CharField("Kỷ luật chính quyền",max_length=100, null=False)
-    date_issue_government = models.DateField("Ngày kỷ luật chính quyền",null=False)
-    violations = models.CharField("Vi phạm",max_length=100, null=False)
-    summary_of_violations = models.TextField("Tóm tắt vi phạm", null=False)
-    date_recognizes_progress = models.DateField("Ngày nhận tiến bộ",null=False)
+    discipline_party = models.CharField("Kỷ luật Đảng",max_length=100, null=True, blank=True)
+    date_issue_party =  models.DateField("Ngày kỷ luật Đảng",null=True, blank=True)
+    discipline_government = models.CharField("Kỷ luật chính quyền",max_length=100, null=True, blank=True)
+    date_issue_government = models.DateField("Ngày kỷ luật chính quyền",null=True, blank=True)
+    violations = models.CharField("Vi phạm",max_length=100, null=True, blank=True)
+    summary_of_violations = models.TextField("Tóm tắt vi phạm", null=True, blank=True)
+    date_recognizes_progress = models.DateField("Ngày nhận tiến bộ",null=True, blank=True)
+    file = models.FileField("File đính kèm",upload_to='employee_Discipline/', null=True, blank=True)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, verbose_name="Người tạo", related_name="emp_Discipline_created",)
+    created_at = models.DateTimeField("Ngày tạo", auto_now_add=True)
+    update_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, verbose_name="Người sửa", related_name="emp_Discipline_updated",)
+    update_at = models.DateTimeField("Ngày sửa", auto_now_add=False,null=True)
+
+     #Xóa file khi xóa bản ghi chức vụ
+    @receiver(post_delete, sender='employee.Emp_Discipline')
+    def delete_file(sender, *args, instance, **kwargs):
+        if instance.file and os.path.isfile(instance.file.path):
+            os.remove(instance.file.path)
+    #Xóa file khi thay đổi file mới
+    @receiver(pre_save, sender='employee.Emp_Discipline')
+    def pre_save_file(sender, instance, **kwargs):
+        if not instance.id:
+            return False
+        try:
+            old_file = Emp_Discipline.objects.get(id=instance.id).file
+        except Emp_Discipline.DoesNotExist:
+            return False
+        new_file = instance.file
+        if not old_file == new_file:
+            if old_file and os.path.isfile(old_file.path):
+                os.remove(old_file.path)
 
     def __str__(self):
         return self.discipline_party
@@ -452,13 +545,37 @@ class Emp_Discipline(models.Model):
 class Emp_Relationship (models.Model):
     id = models.AutoField(primary_key=True)
     emp = models.ForeignKey(Emp_information,to_field='emp_num',db_column='emp_num', on_delete=models.CASCADE, verbose_name="Nhân viên", default='')
-    relationship_type = models.CharField("Loại quan hệ",max_length=100, null=False)
-    full_name = models.CharField("Họ và tên thân nhân",max_length=100, null=False)
-    date_of_birth = models.DateField("Năm sinh",null=False)
-    career = models.CharField("Nghề nghiệp",max_length=100, null=False)
-    title = models.CharField("Chức vụ",max_length=100, null=False)
-    work_unit = models.CharField("Nơi làm việc",max_length=100, null=False)
-    address = models.CharField("Địa chỉ",max_length=100, null=False)
+    relationship_type = models.ForeignKey(relationship_type, on_delete=models.CASCADE, verbose_name="Loại quan hệ", default='')
+    full_name = models.CharField("Họ và tên thân nhân",max_length=100, null=True, blank=True)
+    date_of_birth = models.DateField("Năm sinh",null=True, blank=True)
+    career = models.CharField("Nghề nghiệp",max_length=100, null=True, blank=True)
+    title = models.CharField("Chức vụ",max_length=100, null=True, blank=True)
+    work_unit = models.CharField("Nơi làm việc",max_length=100, null=True, blank=True)
+    address = models.CharField("Địa chỉ",max_length=100, null=True, blank=True)
+    file = models.FileField("File đính kèm",upload_to='employee_Relationship/', null=True, blank=True)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, verbose_name="Người tạo", related_name="emp_Relationship_created",)
+    created_at = models.DateTimeField("Ngày tạo", auto_now_add=True)
+    update_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, verbose_name="Người sửa", related_name="emp_Relationship_updated",)
+    update_at = models.DateTimeField("Ngày sửa", auto_now_add=False,null=True)
+
+    #Xóa file khi xóa bản ghi chức vụ
+    @receiver(post_delete, sender='employee.Emp_Relationship')
+    def delete_file(sender, *args, instance, **kwargs):
+        if instance.file and os.path.isfile(instance.file.path):
+            os.remove(instance.file.path)
+    #Xóa file khi thay đổi file mới
+    @receiver(pre_save, sender='employee.Emp_Relationship')
+    def pre_save_file(sender, instance, **kwargs):
+        if not instance.id:
+            return False
+        try:
+            old_file = Emp_Relationship.objects.get(id=instance.id).file
+        except Emp_Relationship.DoesNotExist:
+            return False
+        new_file = instance.file
+        if not old_file == new_file:
+            if old_file and os.path.isfile(old_file.path):
+                os.remove(old_file.path)
 
     def __str__(self):
         return self.id
@@ -471,6 +588,30 @@ class Emp_Foreign(models.Model):
     to_date = models.DateField("Đến ngày",null=False)
     nation = models.CharField("Quốc gia",max_length=100, null=False)
     reason = models.TextField("Lý do đến", null=False)
+    file = models.FileField("File đính kèm",upload_to='employee_Foreign/', null=True, blank=True)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, verbose_name="Người tạo", related_name="emp_Foreign_created",)
+    created_at = models.DateTimeField("Ngày tạo", auto_now_add=True)
+    update_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, verbose_name="Người sửa", related_name="emp_Foreign_updated",)
+    update_at = models.DateTimeField("Ngày sửa", auto_now_add=False,null=True)
+
+    #Xóa file khi xóa bản ghi chức vụ
+    @receiver(post_delete, sender='employee.Emp_Foreign')
+    def delete_file(sender, *args, instance, **kwargs):
+        if instance.file and os.path.isfile(instance.file.path):
+            os.remove(instance.file.path)
+    #Xóa file khi thay đổi file mới
+    @receiver(pre_save, sender='employee.Emp_Foreign')
+    def pre_save_file(sender, instance, **kwargs):
+        if not instance.id:
+            return False
+        try:
+            old_file = Emp_Foreign.objects.get(id=instance.id).file
+        except Emp_Foreign.DoesNotExist:
+            return False
+        new_file = instance.file
+        if not old_file == new_file:
+            if old_file and os.path.isfile(old_file.path):
+                os.remove(old_file.path)
 
     def __str__(self):
         return self.id
@@ -480,23 +621,73 @@ class Emp_Army(models.Model):
     id = models.AutoField(primary_key=True)
     emp = models.ForeignKey(Emp_information,to_field='emp_num',db_column='emp_num', on_delete=models.CASCADE, verbose_name="Nhân viên", default='')
     date_join = models.DateField("Ngày nhập ngũ",null=False)
-    level = models.CharField("Bậc hàm",max_length=50, null=False)
-    position = models.CharField("Chức vụ",max_length=100, null=False)
+    level = models.ForeignKey(level, on_delete=models.CASCADE, verbose_name="Cấp bậc", default='')
+    position = models.ForeignKey(position, on_delete=models.CASCADE, verbose_name="Chức vụ", default='')
     place = models.CharField("Nơi làm việc",max_length=100, null=False)
     date_out = models.DateField("Ngày xuất ngũ",null=False)
+    file = models.FileField("File đính kèm",upload_to='employee_Army/', null=True, blank=True)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, verbose_name="Người tạo", related_name="emp_Army_created",)
+    created_at = models.DateTimeField("Ngày tạo", auto_now_add=True)
+    update_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, verbose_name="Người sửa", related_name="emp_Army_updated",)
+    update_at = models.DateTimeField("Ngày sửa", auto_now_add=False,null=True)
 
+    #Xóa file khi xóa bản ghi chức vụ
+    @receiver(post_delete, sender='employee.Emp_Army')
+    def delete_file(sender, *args, instance, **kwargs):
+        if instance.file and os.path.isfile(instance.file.path):
+            os.remove(instance.file.path)
+    #Xóa file khi thay đổi file mới
+    @receiver(pre_save, sender='employee.Emp_Army')
+    def pre_save_file(sender, instance, **kwargs):
+        if not instance.id:
+            return False
+        try:
+            old_file = Emp_Army.objects.get(id=instance.id).file
+        except Emp_Army.DoesNotExist:
+            return False
+        new_file = instance.file
+        if not old_file == new_file:
+            if old_file and os.path.isfile(old_file.path):
+                os.remove(old_file.path)
     def __str__(self):
         return self.id
 
 #12 Bảng thông tin sức khỏe
 class Emp_Health(models.Model):
+    wounded_soldiers_CHOICES = (
+        ('Y', 'Có'),
+        ('N', 'Không'),
+    )
     id = models.AutoField(primary_key=True)
     emp = models.ForeignKey(Emp_information,to_field='emp_num',db_column='emp_num', on_delete=models.CASCADE, verbose_name="Nhân viên", default='')
     date_check = models.DateField("Ngày kiểm tra sức khỏe",null=False)
     heal_check = models.CharField("Tình trạng sức khỏe",max_length=100, null=False)
-    wounded_soldiers = models.CharField("Thương binh",max_length=100, null=False)
-    agency = models.CharField("Đơn vị khám bệnh",max_length=100, null=False)    
+    wounded_soldiers = models.CharField("Thương binh",max_length=1, null=False,choices=wounded_soldiers_CHOICES)
+    agency = models.ForeignKey(company, on_delete=models.CASCADE, verbose_name="Cơ quan khám sức khỏe", default='')
+    file = models.FileField("File đính kèm",upload_to='employee_Health/', null=True, blank=True)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, verbose_name="Người tạo", related_name="emp_Health_created",)
+    created_at = models.DateTimeField("Ngày tạo", auto_now_add=True)
+    update_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, verbose_name="Người sửa", related_name="emp_Health_updated",)
+    update_at = models.DateTimeField("Ngày sửa", auto_now_add=False,null=True)
 
+    #Xóa file khi xóa bản ghi chức vụ
+    @receiver(post_delete, sender='employee.Emp_Health')
+    def delete_file(sender, *args, instance, **kwargs):
+        if instance.file and os.path.isfile(instance.file.path):
+            os.remove(instance.file.path)
+    #Xóa file khi thay đổi file mới
+    @receiver(pre_save, sender='employee.Emp_Health')
+    def pre_save_file(sender, instance, **kwargs):
+        if not instance.id:
+            return False
+        try:
+            old_file = Emp_Health.objects.get(id=instance.id).file
+        except Emp_Health.DoesNotExist:
+            return False
+        new_file = instance.file
+        if not old_file == new_file:
+            if old_file and os.path.isfile(old_file.path):
+                os.remove(old_file.path)
     def __str__(self):
         return self.id
 
@@ -545,3 +736,70 @@ class Emp_Disengaged(models.Model):
 
     def __str__(self):
         return self.id
+    
+
+#17 Bảng thông tin quá trình Công tác
+class Emp_workProcess(models.Model):
+    id = models.AutoField(primary_key=True)
+    emp = models.ForeignKey(Emp_information,to_field='emp_num',db_column='emp_num', on_delete=models.CASCADE, verbose_name="Nhân viên", default='')
+    from_date = models.DateField("Từ ngày",null=False)
+    to_date = models.DateField("Đến ngày",null=True, blank=True)
+    emp_title = models.ForeignKey(position, on_delete=models.CASCADE, verbose_name="Chức danh đảm nhiệm")
+    work = models.CharField("Công tác chuyên môn",max_length=100, null=False)
+    emp_company = models.ForeignKey(company, on_delete=models.CASCADE, verbose_name="Đơn vị công tác", default='')
+    decision_number = models.CharField("Số quyết định",max_length=100, null=False)
+    decision_date = models.DateField("Ngày quyết định",null=False)
+    file = models.FileField("File đính kèm",upload_to='employee_workProcess/', null=True, blank=True)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, verbose_name="Người tạo", related_name="emp_workProcess_created",)
+    created_at = models.DateTimeField("Ngày tạo", auto_now_add=True)
+    update_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, verbose_name="Người sửa", related_name="emp_workProcess_updated",)
+    update_at = models.DateTimeField("Ngày sửa", auto_now_add=False,null=True)
+
+    # kiểm soát không overlap chức danh cho cùng 1 nhân viên
+    def clean(self):
+        super().clean()
+        start = self.from_date
+        end = self.to_date
+
+        if not self.emp or not start:
+            return
+        
+        if end and end < start:
+            raise ValidationError("Ngày dừng quyết định >= ngày quyết định")
+        qs = Emp_workProcess.objects.filter(emp=self.emp).exclude(id=self.id)
+
+        # Overlap condition:
+        # [start, end] giao nhau với [a, b]
+        # end null => b = +inf
+        if end:
+            qs = qs.filter(
+                Q(to_date__isnull=True, from_date__lte=end) |
+                Q(to_date__isnull=False, from_date__lte=end, to_date__gte=start)
+            )
+        else:
+            qs = qs.filter(Q(to_date__isnull=True) | Q(to_date__gte=start))
+        if qs.exists():
+            raise ValidationError("Khoảng thời gian chức danh bị chồng lấn với bản ghi khác.")
+        
+        
+    #Xóa file khi xóa bản ghi chức vụ
+    @receiver(post_delete, sender='employee.Emp_workProcess')
+    def delete_file(sender, *args, instance, **kwargs):
+        if instance.file and os.path.isfile(instance.file.path):
+            os.remove(instance.file.path)
+    #Xóa file khi thay đổi file mới
+    @receiver(pre_save, sender='employee.Emp_workProcess')
+    def pre_save_file(sender, instance, **kwargs):
+        if not instance.id:
+            return False
+        try:
+            old_file = Emp_workProcess.objects.get(id=instance.id).file
+        except Emp_workProcess.DoesNotExist:
+            return False
+        new_file = instance.file
+        if not old_file == new_file:
+            if old_file and os.path.isfile(old_file.path):
+                os.remove(old_file.path)
+
+    def __str__(self):
+        return self.work
